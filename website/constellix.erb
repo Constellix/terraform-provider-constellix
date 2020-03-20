@@ -1,0 +1,186 @@
+<% wrap_layout :inner do %>
+    <% content_for :sidebar do %>
+      <div class="docs-sidebar hidden-print affix-top" role="complementary">
+        <ul class="nav docs-sidenav">
+          <li<%= sidebar_current("docs-home") %>>
+          <a href="/docs/providers/index.html">All Providers</a>
+          </li>
+  
+          <li<%= sidebar_current("docs-constellix-index") %>>
+          <a href="/docs/providers/constellix/index.html">Constellix Provider</a>
+          </li>
+  
+          <li<%= sidebar_current("docs-constellix-datasource") %>>
+          <a href="#">Data Resources</a>
+                  <ul class="nav nav-visible">
+                      
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_domain") %>>
+                        <a href="/docs/providers/constellix/d/domain.html">constellix_domain</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_aname_record") %>>
+                        <a href="/docs/providers/constellix/d/aname.html">constellix_aname_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_caa_record") %>>
+                        <a href="/docs/providers/constellix/d/caa.html">constellix_caa_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_contact_lists") %>>
+                        <a href="/docs/providers/constellix/d/contactlist.html">constellix_contact_lists</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_hinfo_record") %>>
+                        <a href="/docs/providers/constellix/d/hinfo.html">constellix_hinfo_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_http_redirection_record") %>>
+                        <a href="/docs/providers/constellix/d/httpredirection.html">constellix_http_redirection_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_mx_record") %>>
+                        <a href="/docs/providers/constellix/d/mx.html">constellix_mx_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_rp_record") %>>
+                        <a href="/docs/providers/constellix/d/rp.html">constellix_rp_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_srv_record") %>>
+                        <a href="/docs/providers/constellix/d/srv.html">constellix_srv_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_tags") %>>
+                        <a href="/docs/providers/constellix/d/tags.html">constellix_tags</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_txt_record") %>>
+                        <a href="/docs/providers/constellix/d/txt.html">constellix_txt_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_vanity_nameserver") %>>
+                        <a href="/docs/providers/constellix/d/vanitynameserver.html">constellix_vanity_nameserver</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_a_record") %>>
+                        <a href="/docs/providers/constellix/d/a.html">constellix_a_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_aaaa_record") %>>
+                        <a href="/docs/providers/constellix/d/aaaa.html">constellix_aaaa_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_aaaa_record_pool") %>>
+                        <a href="/docs/providers/constellix/d/aaaarecordpool.html">constellix_aaaa_record_pool</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_a_record_pool") %>>
+                        <a href="/docs/providers/constellix/d/arecordpool.html">constellix_a_record_pool</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_cert_record") %>>
+                        <a href="/docs/providers/constellix/d/cert.html">constellix_cert_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_cname_record") %>>
+                        <a href="/docs/providers/constellix/d/cname.html">constellix_cname_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_cname_record_pool") %>>
+                        <a href="/docs/providers/constellix/d/cnamerecordpool.html">constellix_cname_record_pool</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_geo_filter") %>>
+                        <a href="/docs/providers/constellix/d/geofilter.html">constellix_geo_filter</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_geo_proximity") %>>
+                        <a href="/docs/providers/constellix/d/geoproximity.html">constellix_geo_proximity</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_naptr_record") %>>
+                        <a href="/docs/providers/constellix/d/naptr.html">constellix_naptr_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_ns_record") %>>
+                        <a href="/docs/providers/constellix/d/ns.html">constellix_ns_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_ptr_record") %>>
+                        <a href="/docs/providers/constellix/d/ptr.html">constellix_ptr_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_spf_record") %>>
+                        <a href="/docs/providers/constellix/d/spf.html">constellix_spf_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-data-source-constellix_template") %>>
+                        <a href="/docs/providers/constellix/d/template.html">constellix_template</a>
+                      </li>
+                  </ul>
+          </li>
+          <li<%= sidebar_current("docs-constellix-resource") %>>
+          <a href="#">Resources</a>
+                  <ul class="nav nav-visible">
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_domain") %>>
+                        <a href="/docs/providers/constellix/r/domain.html">constellix_domain</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_aname_record") %>>
+                        <a href="/docs/providers/constellix/r/aname.html">constellix_aname_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_srv_record") %>>
+                        <a href="/docs/providers/constellix/r/srv.html">constellix_srv_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_hinfo_record") %>>
+                        <a href="/docs/providers/constellix/r/hinfo.html">constellix_hinfo_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_http_redirection") %>>
+                        <a href="/docs/providers/constellix/r/httpredirection.html">constellix_http_redirection_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_caa_record") %>>
+                        <a href="/docs/providers/constellix/r/caa.html">constellix_caa_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_mx_record") %>>
+                        <a href="/docs/providers/constellix/r/mx.html">constellix_mx_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_rp_record") %>>
+                        <a href="/docs/providers/constellix/r/rp.html">constellix_rp_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_tags") %>>
+                        <a href="/docs/providers/constellix/r/tags.html">constellix_tags</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_vanity_nameserver") %>>
+                        <a href="/docs/providers/constellix/r/vanitynameserver.html">constellix_vanity_nameserver</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_txt_record") %>>
+                        <a href="/docs/providers/constellix/r/txt.html">constellix_txt_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_contact_lists") %>>
+                        <a href="/docs/providers/constellix/r/contactlist.html">constellix_contact_lists</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_a_record") %>>
+                        <a href="/docs/providers/constellix/r/a.html">constellix_a_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_aaaa_record") %>>
+                        <a href="/docs/providers/constellix/r/aaaa.html">constellix_aaaa_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_cname_record") %>>
+                        <a href="/docs/providers/constellix/r/cname.html">constellix_cname_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_naptr_record") %>>
+                        <a href="/docs/providers/constellix/r/naptr.html">constellix_naptr_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_ns_record") %>>
+                      <a href="/docs/providers/constellix/r/ns.html">constellix_ns_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_template") %>>
+                        <a href="/docs/providers/constellix/r/template.html">constellix_template</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_geo_filter") %>>
+                       <a href="/docs/providers/constellix/r/geofilter.html">constellix_geo_filter</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_cert_record") %>>
+                        <a href="/docs/providers/constellix/r/cert.html">constellix_cert_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_a_record_pool") %>>
+                        <a href="/docs/providers/constellix/r/arecordpool.html">constellix_a_record_pool</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_cname_record_pool") %>>
+                        <a href="/docs/providers/constellix/r/cnamerecordpool.html">constellix_cname_record_pool</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_ptr_record") %>>
+                        <a href="/docs/providers/constellix/r/ptr.html">constellix_ptr_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_spf_record") %>>
+                        <a href="/docs/providers/constellix/r/spf.html">constellix_spf_record</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_geo_proximity") %>>
+                        <a href="/docs/providers/constellix/r/geoproximity.html">constellix_geo_proximity</a>
+                      </li>
+                      <li<%= sidebar_current("docs-constellix-resource-constellix_aaaa_record_pool") %>>
+                        <a href="/docs/providers/constellix/r/aaaarecordpool.html">constellix_aaaa_record_pool</a>
+                      </li>
+                     
+                  </ul>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+  
+    <%= yield %>
+    <% end %>

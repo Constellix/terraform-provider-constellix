@@ -1,0 +1,51 @@
+---
+layout: "constellix"
+page_title: "Constellix: constellix_hinfo_record"
+sidebar_current: "docs-constellix-resource-constellix_hinfo_record"
+description: |-
+    Manages one or more HINFO records.
+---
+# constellix_hinfo_record #
+Manages one or more HINFO records.
+
+# Example Usage #
+```hcl
+        
+resource "constellix_hinfo_record" "hinfo1" {
+  domain_id   = "${constellix_domain.domain1.id}"
+  source_type = "domains"
+  name        = "hinforecord"
+  ttl         = "1900"
+  noanswer    = false
+  note        = ""
+  gtd_region  = 1
+  type        = "HINFO"
+  roundrobin {
+    cpu          = "quard core"
+    os           = "linux2"
+    disable_flag = "false"
+  }
+  roundrobin {
+    cpu          = "abc"
+    os           = "winddows"
+    disable_flag = "true"
+  }
+}
+
+```
+
+## Argument Reference ##
+* `ttl` - (Required) TTL must be in between 0 and 2147483647
+* `source_type` - (Required) "domains" for Domain records and "template" for Template records
+* `roundrobin` - (Required) Set
+* `roundrobin.cpu` - (Required) A description of basic system hardware
+* `roundrobin.disable_flag` - (Optional) Enable or Disable the roundrobin object. Default is false. Atleast one roundrobin object should be false.
+* `roundrobin.os` - (Required) A description of the operating system and version
+* `name` - (Optional) Name of record. Name should be unique.
+* `noanswer` - (Optional) Shows if record is enabled or disabled. Default is false (Active)
+* `note` - (Optional) Record note
+* `gtd_region` - (Optional) Shows id of GTD region in which record is to be created, 1 for World (Default), 2 for Europe, 3 for US East, 4 for US West, 5 for Asia Pacific, 6 for Oceania, note: "gtdRegion" from 2 to 6 will be applied only when GTD region is enabled on domain.
+* `type` - (Optional) Record type HINFO
+
+## Attribute Reference ##
+The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of hinfo resource.
