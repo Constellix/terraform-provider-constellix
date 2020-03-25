@@ -218,6 +218,10 @@ func resourceConstellixCnameRecordPoolRead(d *schema.ResourceData, m interface{}
 
 	resp, err := client.GetbyId("v1/pools/CNAME/" + cnamerecordpoolid)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	bodybytes, err := ioutil.ReadAll(resp.Body)

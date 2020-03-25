@@ -170,6 +170,13 @@ func resourceConstellixSRVRecordRead(d *schema.ResourceData, m interface{}) erro
 	srvid := d.Id()
 
 	resp, err := constellixClient.GetbyId("v1/" + d.Get("source_type").(string) + "/" + d.Get("domain_id").(string) + "/records/srv/" + srvid)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
+		return err
+	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err

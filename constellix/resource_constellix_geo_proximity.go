@@ -163,6 +163,10 @@ func resourceConstellixGeoProximityRead(d *schema.ResourceData, m interface{}) e
 
 	resp, err := client.GetbyId("v1/geoProximities/" + geoproximityid)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	bodybytes, err := ioutil.ReadAll(resp.Body)

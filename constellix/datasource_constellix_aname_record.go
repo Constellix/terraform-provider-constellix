@@ -141,6 +141,9 @@ func datasourceConstellixAnamerecordRead(d *schema.ResourceData, m interface{}) 
 	name := d.Get("name").(string)
 
 	resp, err := client.GetbyId("v1/" + d.Get("source_type").(string) + "/" + d.Get("domain_id").(string) + "/records/aname")
+	if err != nil {
+		return err
+	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err

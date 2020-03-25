@@ -92,6 +92,10 @@ func resourceConstellixContactListRead(d *schema.ResourceData, m interface{}) er
 	cid := d.Id()
 	resp, err := client.GetbyId("v2/contactLists/" + cid)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	bodybytes, err := ioutil.ReadAll(resp.Body)

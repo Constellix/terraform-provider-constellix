@@ -330,6 +330,13 @@ func resourceConstellixAAAARecordRead(d *schema.ResourceData, m interface{}) err
 	arecordid := d.Id()
 
 	resp, err := constellixClient.GetbyId("v1/" + d.Get("source_type").(string) + "/" + d.Get("domain_id").(string) + "/records/aaaa/" + arecordid)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
+		return err
+	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err

@@ -205,6 +205,10 @@ func resourceConstellixSpfRead(d *schema.ResourceData, m interface{}) error {
 
 	resp, err := client.GetbyId("v1/" + stid + "/" + domainid + "/records/spf/" + spfid)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	bodybytes, err := ioutil.ReadAll(resp.Body)

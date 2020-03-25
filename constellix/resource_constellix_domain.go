@@ -202,6 +202,13 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	constellixclient := m.(*client.Client)
 	dn := d.Id()
 	resp, err := constellixclient.GetbyId("v1/domains/" + dn)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
+		return err
+	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err

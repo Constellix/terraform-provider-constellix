@@ -161,6 +161,10 @@ func resourceConstellixIPFilterRead(d *schema.ResourceData, m interface{}) error
 
 	resp, err := constellixClient.GetbyId("v1/geoFilters/" + nsid)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
