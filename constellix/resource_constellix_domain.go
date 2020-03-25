@@ -144,7 +144,7 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if tg, ok := d.GetOk("tags"); ok {
-		tagsList := toStringList(tg.([]interface{}))
+		tagsList := tg.([]interface{})
 		domainAttr.Tags = tagsList
 	}
 
@@ -266,7 +266,7 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if d.HasChange("tags") {
-		tagsList := toStringList(d.Get("tags").([]interface{}))
+		tagsList := d.Get("tags").([]interface{})
 		domainAttr.Tags = tagsList
 	}
 

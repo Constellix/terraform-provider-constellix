@@ -66,6 +66,9 @@ func Provider() terraform.ResourceProvider {
 			"constellix_vanity_nameserver":       resourceConstellixVanityNameserver(),
 			"constellix_contact_lists":           resourceConstellixContactList(),
 			"constellix_tags":                    resourceConstellixTags(),
+			"constellix_http_check":              resourceConstellixHTTPCheck(),
+			"constellix_tcp_check":               resourceConstellixTCPCheck(),
+			"constellix_dns_check":               resourceConstellixDNSCheck(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -95,6 +98,9 @@ func Provider() terraform.ResourceProvider {
 			"constellix_aaaa_record_pool":        datasourceConstellixAAAArecordpool(),
 			"constellix_srv_record":              datasourceConstellixSRV(),
 			"constellix_geo_filter":              datasourceConstellixIPFilter(),
+			"constellix_http_check":              datasourceConstellixHTTPCheck(),
+			"constellix_tcp_check":               datasourceConstellixTCPCheck(),
+			"constellix_dns_check":               datasourceConstellixDNSCheck(),
 		},
 
 		ConfigureFunc: configureClient,
