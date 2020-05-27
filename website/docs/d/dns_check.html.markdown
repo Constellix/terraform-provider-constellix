@@ -24,9 +24,6 @@ data "constellix_dns_check" "check" {
 
 ## Attribute Reference ##
 * `name` - (Required) name of the resource. Name should be unique.
-* `host` - (Required) Host for the resource, for example "constellix.com". It can be set only once.
-* `fqdn` - (Required) A website address.
-* `resolver` - (Required) A website address.
-* `port` - (Required) Specifies the port number.
-* `protocol_type` - (Required) Specifies upper layer protocol like HTTP, HTTPs, etc.
+* `fqdn` - (Required) A website address. It can be set only once
+* `resolver` - (Required) A website address. It can be set only once
 * `check_sites` - (Required) Site ids to check.

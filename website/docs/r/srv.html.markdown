@@ -38,9 +38,9 @@ resource "constellix_srv_record" "srvrecord1" {
 * `roundrobin` - (Required) Set
 * `roundrobin.value` - (Required) The system that will receive the service.
 * `roundrobin.disable_flag` - (Optional) Enable or Disable the roundrobin object. Default is false. Atleast one roundrobin object should be false.
-* `roundrobin.port` - (Required) The port of the service offered.
-* `roundrobin.priority` - (Required) The lower the number in the priority field, the higher the preference of the associated target. 0 is the highest priority (lowest number).
-* `roundrobin.weight` - (Required) The weight of the record allows an administrator to distribute load to multiple targets (load balance).
+* `roundrobin.port` - (Required) The port of the service offered. Value should be between 0 and 65535.
+* `roundrobin.priority` - (Required) The lower the number in the priority field, the higher the preference of the associated target. 0 is the highest priority (lowest number). Value should be between 0 and 65535.
+* `roundrobin.weight` - (Required) The weight of the record allows an administrator to distribute load to multiple targets (load balance). Value should be between 0 and 65535.
 * `name` - (Optional) Name of record. Name should be unique.
 * `noanswer` - (Optional) Shows if record is enabled or disabled. Default is false (Active)
 * `note` - (Optional) Record note
