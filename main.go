@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Constellix/terraform-provider-constellix/constellix"
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
+	"github.com/terraform-providers/terraform-provider-constellix/constellix"
 )
 
 func main() {
