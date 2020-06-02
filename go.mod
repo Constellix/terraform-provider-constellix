@@ -1,4 +1,4 @@
-module github.com/Constellix/terraform-provider-constellix
+module github.com/terraform-providers/terraform-provider-constellix
 
 go 1.13
 
