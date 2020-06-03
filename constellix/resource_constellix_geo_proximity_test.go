@@ -63,7 +63,7 @@ func testAccCheckConstellixGeoProximityConfig_basic(tp int) string {
 
 	resource "constellix_geo_proximity" "gp1" {
 	
-		name = "tempgeoproximityrecord"
+		name = "tempgeoproximityrecordtestcheck"
 		country = "OM"
 		city = "%v"
 	}
@@ -99,7 +99,7 @@ func testAccCheckConstellixGeoProximityExists(gpName string, gp *models.GeoProxi
 
 func testAccCheckConstellixGeoProximityAttributes(gp *models.GeoProximityAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if "tempgeoproximityrecord" != gp.Name {
+		if "tempgeoproximityrecordtestcheck" != gp.Name {
 			return fmt.Errorf("Bad GeoProximity record name %s", gp.Name)
 		}
 		return nil

@@ -85,10 +85,10 @@ func testAccCheckConstellixHTTPCheckExists(httpName string, http *models.Httpche
 
 		client := testAccProvider.Meta().(*client.Client)
 
-		resp, err := client.GetbyId("https://api.sonar.constellix.com/rest/api/http/" + rs.Primary.ID)
+		resp, err1 := client.GetbyId("https://api.sonar.constellix.com/rest/api/http/" + rs.Primary.ID)
 
-		if err != nil {
-			return err
+		if err1 != nil {
+			return err1
 		}
 
 		tp, _ := httpCheckfromcontainer(resp)
