@@ -61,7 +61,7 @@ func TestAccConstellixAname_Update(t *testing.T) {
 func testAccCheckConstellixAnameConfig_basic(ttl int) string {
 	return fmt.Sprintf(`
 	resource "constellix_domain" "domain1" {
-		name = "domaintest1.com"
+		name = "domaintestaname.com"
 		soa = {
 			email = "com.com."
 			primary_nameserver = "ns41.constellix.com."
