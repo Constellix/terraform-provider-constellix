@@ -44,6 +44,31 @@ func resourceConstellixTCPCheck() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 				Required: true,
 			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"string_to_send": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"string_to_receive": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -72,6 +97,25 @@ func resourceConstellixTCPCheckCreate(d *schema.ResourceData, m interface{}) err
 
 	if checksites, ok := d.GetOk("check_sites"); ok {
 		tcpcheckAttr.Checksites = checksites.([]interface{})
+	}
+
+	if interval, ok := d.GetOk("interval"); ok {
+		tcpcheckAttr.Interval = interval.(string)
+	}
+
+	if interval_policy, ok := d.GetOk("interval_policy"); ok {
+		tcpcheckAttr.IntervalPolicy = interval_policy.(string)
+	}
+
+	if verification_policy, ok := d.GetOk("verification_policy"); ok {
+		tcpcheckAttr.VerificationPolicy = verification_policy.(string)
+	}
+
+	if string_to_send, ok := d.GetOk("string_to_send"); ok {
+		tcpcheckAttr.StringToSend = string_to_send.(string)
+	}
+	if string_to_receive, ok := d.GetOk("string_to_receive"); ok {
+		tcpcheckAttr.StringToReceive = string_to_receive.(string)
 	}
 
 	resp, err := client.Save(tcpcheckAttr, "https://api.sonar.constellix.com/rest/api/tcp")
@@ -113,6 +157,25 @@ func resourceConstellixTCPCheckUpdate(d *schema.ResourceData, m interface{}) err
 		tcpcheckAttr.Checksites = checksites.([]interface{})
 	}
 
+	if interval, ok := d.GetOk("interval"); ok {
+		tcpcheckAttr.Interval = interval.(string)
+	}
+
+	if interval_policy, ok := d.GetOk("interval_policy"); ok {
+		tcpcheckAttr.IntervalPolicy = interval_policy.(string)
+	}
+
+	if verification_policy, ok := d.GetOk("verification_policy"); ok {
+		tcpcheckAttr.VerificationPolicy = verification_policy.(string)
+	}
+
+	if string_to_send, ok := d.GetOk("string_to_send"); ok {
+		tcpcheckAttr.StringToSend = string_to_send.(string)
+	}
+	if string_to_receive, ok := d.GetOk("string_to_receive"); ok {
+		tcpcheckAttr.StringToReceive = string_to_receive.(string)
+	}
+
 	dn := d.Id()
 	_, err := client.UpdatebyID(tcpcheckAttr, "https://api.sonar.constellix.com/rest/api/tcp/"+dn)
 	if err != nil {
@@ -143,6 +206,10 @@ func resourceConstellixTCPCheckRead(d *schema.ResourceData, m interface{}) error
 	d.Set("ip_version", data["ipVersion"])
 	d.Set("port", data["port"])
 	d.Set("check_sites", data["checkSites"])
+	d.Set("interval", data["interval"])
+	d.Set("interval_policy", data["monitorIntervalPolicy"])
+	d.Set("string_to_send", data["stringToSend"])
+	d.Set("string_to_receive", data["stringToReceive"])
 	return nil
 }
 

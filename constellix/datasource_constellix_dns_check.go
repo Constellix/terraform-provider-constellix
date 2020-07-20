@@ -19,24 +19,6 @@ func datasourceConstellixDNSCheck() *schema.Resource {
 				Required: true,
 			},
 
-			"host": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
-			},
-
-			"protocol_type": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
 			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -50,6 +32,26 @@ func datasourceConstellixDNSCheck() *schema.Resource {
 			},
 
 			"check_sites": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"expected_response": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -84,11 +86,12 @@ func datasourceConstellixDNSCheckRead(d *schema.ResourceData, m interface{}) err
 			d.Set("id", tp["id"])
 			d.Set("name", tp["name"])
 			d.Set("fqdn", tp["fqdn"])
-			d.Set("host", tp["host"])
-			d.Set("protocol_type", tp["protocolType"])
-			d.Set("port", tp["port"])
 			d.Set("resolver", tp["resolver"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("interval", tp["interval"])
+			d.Set("interval_policy", tp["monitorIntervalPolicy"])
+			d.Set("verification_policy", tp["verificationPolicy"])
+			d.Set("expected_response", tp["expectedResponse"])
 		}
 	}
 	if flag == false {

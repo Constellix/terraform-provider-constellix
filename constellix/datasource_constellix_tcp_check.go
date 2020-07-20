@@ -43,6 +43,31 @@ func datasourceConstellixTCPCheck() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"string_to_send": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"string_to_receive": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -76,6 +101,10 @@ func datasourceConstellixTCPCheckRead(d *schema.ResourceData, m interface{}) err
 			d.Set("ip_version", tp["ipVersion"])
 			d.Set("port", tp["port"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("interval", tp["interval"])
+			d.Set("interval_policy", tp["monitorIntervalPolicy"])
+			d.Set("string_to_send", tp["stringToSend"])
+			d.Set("string_to_receive", tp["stringToReceive"])
 		}
 	}
 	if flag != true {

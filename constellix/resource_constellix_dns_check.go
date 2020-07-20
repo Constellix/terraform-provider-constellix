@@ -27,35 +27,42 @@ func resourceConstellixDNSCheck() *schema.Resource {
 				ForceNew: true,
 			},
 
-			"host": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-
-			"port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
-			},
-
-			"protocol_type": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-
 			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"resolver": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"check_sites": &schema.Schema{
 				Type:     schema.TypeList,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"expected_response": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 		},
 	}
@@ -71,18 +78,6 @@ func resourceConstellixDNSCheckCreate(d *schema.ResourceData, m interface{}) err
 		dnsAttr.Name = name.(string)
 	}
 
-	if host, ok := d.GetOk("host"); ok {
-		dnsAttr.Host = host.(string)
-	}
-
-	if port, ok := d.GetOk("port"); ok {
-		dnsAttr.Port = port.(int)
-	}
-
-	if ptype, ok := d.GetOk("protocol_type"); ok {
-		dnsAttr.ProtocolType = ptype.(string)
-	}
-
 	if fqdn, ok := d.GetOk("fqdn"); ok {
 		dnsAttr.FQDN = fqdn.(string)
 	}
@@ -93,6 +88,22 @@ func resourceConstellixDNSCheckCreate(d *schema.ResourceData, m interface{}) err
 
 	if checksites, ok := d.GetOk("check_sites"); ok {
 		dnsAttr.CheckSites = checksites.([]interface{})
+	}
+
+	if interval, ok := d.GetOk("interval"); ok {
+		dnsAttr.Interval = interval.(string)
+	}
+
+	if interval_policy, ok := d.GetOk("interval_policy"); ok {
+		dnsAttr.IntervalPolicy = interval_policy.(string)
+	}
+
+	if verification_policy, ok := d.GetOk("verification_policy"); ok {
+		dnsAttr.VerificationPolicy = verification_policy.(string)
+	}
+
+	if expected_response, ok := d.GetOk("expected_response"); ok {
+		dnsAttr.ExpectedResponse = expected_response.(string)
 	}
 
 	resp, err := constellixConnect.Save(dnsAttr, "https://api.sonar.constellix.com/rest/api/dns")
@@ -139,12 +150,13 @@ func resourceConstellixDNSCheckRead(d *schema.ResourceData, m interface{}) error
 	json.Unmarshal([]byte(bodystring), &data)
 	d.Set("id", data["id"])
 	d.Set("name", data["name"])
-	d.Set("host", data["host"])
-	d.Set("protocol_type", data["protocolType"])
-	d.Set("port", data["port"])
 	d.Set("fqdn", data["fqdn"])
 	d.Set("resolver", data["resolver"])
 	d.Set("check_sites", data["checkSites"])
+	d.Set("interval", data["interval"])
+	d.Set("interval_policy", data["monitorIntervalPolicy"])
+	d.Set("verification_policy", data["verificationPolicy"])
+	d.Set("expected_response", data["expectedResponse"])
 	return nil
 }
 
@@ -157,24 +169,24 @@ func resourceConstellixDNSCheckUpdate(d *schema.ResourceData, m interface{}) err
 		dnsAttr.Name = name.(string)
 	}
 
-	if port, ok := d.GetOk("port"); ok {
-		dnsAttr.Port = port.(int)
-	}
-
-	if value, ok := d.GetOk("fqdn"); ok {
-		dnsAttr.FQDN = value.(string)
-	}
-
-	if value, ok := d.GetOk("resolver"); ok {
-		dnsAttr.Resolver = value.(string)
-	}
-
-	if ptype, ok := d.GetOk("protocol_type"); ok {
-		dnsAttr.ProtocolType = ptype.(string)
-	}
-
 	if checksites, ok := d.GetOk("check_sites"); ok {
 		dnsAttr.CheckSites = checksites.([]interface{})
+	}
+
+	if interval, ok := d.GetOk("interval"); ok {
+		dnsAttr.Interval = interval.(string)
+	}
+
+	if interval_policy, ok := d.GetOk("interval_policy"); ok {
+		dnsAttr.IntervalPolicy = interval_policy.(string)
+	}
+
+	if verification_policy, ok := d.GetOk("verification_policy"); ok {
+		dnsAttr.VerificationPolicy = verification_policy.(string)
+	}
+
+	if expected_response, ok := d.GetOk("expected_response"); ok {
+		dnsAttr.ExpectedResponse = expected_response.(string)
 	}
 
 	dn := d.Id()

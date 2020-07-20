@@ -27,6 +27,11 @@ resource "constellix_tcp_check" "first" {
 * `ip_version` - (Required) Specifies the version of IP. It can be set only once.
 * `port` - (Required) Specifies the port number.
 * `check_sites` - (Required) Site ids to check.
+* `interval` - (Optional) Check Interval. Allowed values are `THIRTYSECONDS`, `ONEMINUTE`, `TWOMINUTES`, `THREEMINUTES`, `FOURMINUTES`, `FIVEMINUTES`, `TENMINUTES`, `THIRTYMINUTES`, `HALFDAY` and `DAY`.
+* `interval_policy` - (Optional) Agent Interval Run Policy. It specifies whether you want to run checks from one location or all. Allowed values are `PARALLEL`, `ONCEPERSITE` and `ONCEPERREGION`.
+* `validation_policy` - (Optional) Specifies how the check should be validated. Allowed values are `SIMPLE` and `MAJORITY`. This parameter will only work with the `interval_policy` set to `PARALLEL`.
+* `string_to_send` - (Optional) String to send along with the check. It can be any parameter to the endpoint.
+* `string_to_receive` - (Optional) String which should be received as a result of TCP check.
 
 ## Attribute Reference ##
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of TCP check resource.

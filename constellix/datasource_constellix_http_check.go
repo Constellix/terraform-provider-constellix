@@ -49,6 +49,41 @@ func datasourceConstellixHTTPCheck() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"fqdn": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"path": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"search_string": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"expected_status_code": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -83,6 +118,13 @@ func datasourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) er
 			d.Set("ip_version", tp["ipVersion"])
 			d.Set("port", tp["port"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("interval", tp["interval"])
+			d.Set("interval_policy", tp["monitorIntervalPolicy"])
+			d.Set("verification_policy", tp["verificationPolicy"])
+			d.Set("fqdn", tp["fqdn"])
+			d.Set("path", tp["path"])
+			d.Set("search_string", tp["searchString"])
+			d.Set("expected_status_code", tp["expectedStatusCode"])
 		}
 	}
 	if flag != true {

@@ -29,6 +29,13 @@ resource "constellix_http_check" "first" {
 * `port` - (Required) Specifies the port number.
 * `protocol_type` - (Required) Specifies upper layer protocol like HTTP, HTTPs, etc.
 * `check_sites` - (Required) Site ids to check.
+* `interval` - (Optional) Check Interval. Allowed values are `THIRTYSECONDS`, `ONEMINUTE`, `TWOMINUTES`, `THREEMINUTES`, `FOURMINUTES`, `FIVEMINUTES`, `TENMINUTES`, `THIRTYMINUTES`, `HALFDAY` and `DAY`.
+* `interval_policy` - (Optional) Agent Interval Run Policy. It specifies whether you want to run checks from one location or all. Allowed values are `PARALLEL`, `ONCEPERSITE` and `ONCEPERREGION`.
+* `validation_policy` - (Optional) Specifies how the check should be validated. Allowed values are `SIMPLE` and `MAJORITY`. This parameter will only work with the `interval_policy` set to `PARALLEL`.
+* `fqdn` - (Optional) Fully qualified domain name of the URL should be checked.
+* `path` - (Optional) In case of multi-page site, which path should be checked.
+* `search_string` - (Optional) String to search in the first 2KB of resonse received.
+* `expected_status_code` - (Optional) Expected HTTP status code for this check.
 
 ## Attribute Reference ##
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of HTTP check resource.
