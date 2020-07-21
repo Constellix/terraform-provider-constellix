@@ -7,6 +7,7 @@ import (
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func datasourceConstellixTCPCheck() *schema.Resource {
@@ -43,6 +44,52 @@ func datasourceConstellixTCPCheck() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"THIRTYSECONDS",
+					"ONEMINUTE",
+					"TWOMINUTES",
+					"THREEMINUTES",
+					"FOURMINUTES",
+					"FIVEMINUTES",
+					"TENMINUTES",
+					"THIRTYMINUTES",
+					"HALFDAY",
+					"DAY",
+				}, false),
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"PARALLEL",
+					"ONCEPERSITE",
+					"ONCEPERREGION",
+				}, false),
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"SIMPLE",
+					"MAJORITY",
+				}, false),
+			},
+			"string_to_send": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"string_to_receive": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -76,6 +123,10 @@ func datasourceConstellixTCPCheckRead(d *schema.ResourceData, m interface{}) err
 			d.Set("ip_version", tp["ipVersion"])
 			d.Set("port", tp["port"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("interval", tp["interval"])
+			d.Set("interval_policy", tp["monitorIntervalPolicy"])
+			d.Set("string_to_send", tp["stringToSend"])
+			d.Set("string_to_receive", tp["stringToReceive"])
 		}
 	}
 	if flag != true {

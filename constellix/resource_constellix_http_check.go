@@ -9,6 +9,7 @@ import (
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceConstellixHTTPCheck() *schema.Resource {
@@ -51,6 +52,62 @@ func resourceConstellixHTTPCheck() *schema.Resource {
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"THIRTYSECONDS",
+					"ONEMINUTE",
+					"TWOMINUTES",
+					"THREEMINUTES",
+					"FOURMINUTES",
+					"FIVEMINUTES",
+					"TENMINUTES",
+					"THIRTYMINUTES",
+					"HALFDAY",
+					"DAY",
+				}, false),
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"PARALLEL",
+					"ONCEPERSITE",
+					"ONCEPERREGION",
+				}, false),
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"SIMPLE",
+					"MAJORITY",
+				}, false),
+			},
+			"fqdn": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"path": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"search_string": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"expected_status_code": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -82,6 +139,31 @@ func resourceConstellixHTTPCheckCreate(d *schema.ResourceData, m interface{}) er
 
 	if checksites, ok := d.GetOk("check_sites"); ok {
 		httpcheckAttr.Checksites = checksites.([]interface{})
+	}
+
+	if interval, ok := d.GetOk("interval"); ok {
+		httpcheckAttr.Interval = interval.(string)
+	}
+
+	if interval_policy, ok := d.GetOk("interval_policy"); ok {
+		httpcheckAttr.IntervalPolicy = interval_policy.(string)
+	}
+
+	if verification_policy, ok := d.GetOk("verification_policy"); ok {
+		httpcheckAttr.VerificationPolicy = verification_policy.(string)
+	}
+
+	if fqdn, ok := d.GetOk("fqdn"); ok {
+		httpcheckAttr.FQDN = fqdn.(string)
+	}
+	if path, ok := d.GetOk("path"); ok {
+		httpcheckAttr.PATH = path.(string)
+	}
+	if search_string, ok := d.GetOk("search_string"); ok {
+		httpcheckAttr.SearchString = search_string.(string)
+	}
+	if expected_status_code, ok := d.GetOk("expected_status_code"); ok {
+		httpcheckAttr.ExpectedStatus = expected_status_code.(int)
 	}
 
 	resp, err := client.Save(httpcheckAttr, "https://api.sonar.constellix.com/rest/api/http")
@@ -126,6 +208,30 @@ func resourceConstellixHTTPCheckUpdate(d *schema.ResourceData, m interface{}) er
 	if checksites, ok := d.GetOk("check_sites"); ok {
 		httpcheckAttr.Checksites = checksites.([]interface{})
 	}
+	if interval, ok := d.GetOk("interval"); ok {
+		httpcheckAttr.Interval = interval.(string)
+	}
+
+	if interval_policy, ok := d.GetOk("interval_policy"); ok {
+		httpcheckAttr.IntervalPolicy = interval_policy.(string)
+	}
+
+	if verification_policy, ok := d.GetOk("verification_policy"); ok {
+		httpcheckAttr.VerificationPolicy = verification_policy.(string)
+	}
+
+	if fqdn, ok := d.GetOk("fqdn"); ok {
+		httpcheckAttr.FQDN = fqdn.(string)
+	}
+	if path, ok := d.GetOk("path"); ok {
+		httpcheckAttr.PATH = path.(string)
+	}
+	if search_string, ok := d.GetOk("search_string"); ok {
+		httpcheckAttr.SearchString = search_string.(string)
+	}
+	if expected_status_code, ok := d.GetOk("expected_status_code"); ok {
+		httpcheckAttr.ExpectedStatus = expected_status_code.(int)
+	}
 
 	dn := d.Id()
 	_, err := client.UpdatebyID(httpcheckAttr, "https://api.sonar.constellix.com/rest/api/http/"+dn)
@@ -158,6 +264,13 @@ func resourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) erro
 	d.Set("ip_version", data["ipVersion"])
 	d.Set("port", data["port"])
 	d.Set("check_sites", data["checkSites"])
+	d.Set("interval", data["interval"])
+	d.Set("interval_policy", data["monitorIntervalPolicy"])
+	d.Set("verification_policy", data["verificationPolicy"])
+	d.Set("fqdn", data["fqdn"])
+	d.Set("path", data["path"])
+	d.Set("search_string", data["searchString"])
+	d.Set("expected_status_code", data["expectedStatusCode"])
 	return nil
 }
 

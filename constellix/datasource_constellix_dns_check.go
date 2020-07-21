@@ -7,6 +7,7 @@ import (
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func datasourceConstellixDNSCheck() *schema.Resource {
@@ -17,24 +18,6 @@ func datasourceConstellixDNSCheck() *schema.Resource {
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-			},
-
-			"host": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"port": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
-			},
-
-			"protocol_type": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
 			},
 
 			"fqdn": &schema.Schema{
@@ -50,6 +33,47 @@ func datasourceConstellixDNSCheck() *schema.Resource {
 			},
 
 			"check_sites": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"interval": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"THIRTYSECONDS",
+					"ONEMINUTE",
+					"TWOMINUTES",
+					"THREEMINUTES",
+					"FOURMINUTES",
+					"FIVEMINUTES",
+					"TENMINUTES",
+					"THIRTYMINUTES",
+					"HALFDAY",
+					"DAY",
+				}, false),
+			},
+			"interval_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"PARALLEL",
+					"ONCEPERSITE",
+					"ONCEPERREGION",
+				}, false),
+			},
+			"verification_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"SIMPLE",
+					"MAJORITY",
+				}, false),
+			},
+			"expected_response": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -84,11 +108,12 @@ func datasourceConstellixDNSCheckRead(d *schema.ResourceData, m interface{}) err
 			d.Set("id", tp["id"])
 			d.Set("name", tp["name"])
 			d.Set("fqdn", tp["fqdn"])
-			d.Set("host", tp["host"])
-			d.Set("protocol_type", tp["protocolType"])
-			d.Set("port", tp["port"])
 			d.Set("resolver", tp["resolver"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("interval", tp["interval"])
+			d.Set("interval_policy", tp["monitorIntervalPolicy"])
+			d.Set("verification_policy", tp["verificationPolicy"])
+			d.Set("expected_response", tp["expectedResponse"])
 		}
 	}
 	if flag == false {

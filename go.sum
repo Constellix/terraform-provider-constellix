@@ -37,6 +37,8 @@ github.com/Constellix/constellix-go-client v1.0.0 h1:1V3NK2HKdlaKEJ1Fy3dbI9Fk/sQ
 github.com/Constellix/constellix-go-client v1.0.0/go.mod h1:zd3j7BeCZvtZ8pfDYwv/JUSKQ72hgRWFYicBgVUnHFo=
 github.com/Constellix/constellix-go-client v1.0.1 h1:D3Ze3HaKIk9SRn5B7UvMjBD/Vh1DhCKXtGikU5dLpSE=
 github.com/Constellix/constellix-go-client v1.0.1/go.mod h1:zd3j7BeCZvtZ8pfDYwv/JUSKQ72hgRWFYicBgVUnHFo=
+github.com/Constellix/constellix-go-client v1.0.2 h1:MwQc3e2i54jHtXpg9ijcDtF3ulmLFbkIQeyspyRxjQ8=
+github.com/Constellix/constellix-go-client v1.0.2/go.mod h1:zd3j7BeCZvtZ8pfDYwv/JUSKQ72hgRWFYicBgVUnHFo=
 github.com/QcloudApi/qcloud_sign_golang v0.0.0-20141224014652-e4130a326409/go.mod h1:1pk82RBxDY/JZnPQrtqHlUFfCctgdorsd9M06fMynOM=
 github.com/Unknwon/com v0.0.0-20151008135407-28b053d5a292/go.mod h1:KYCjqMOeHpNuTOiFQU6WEcTG7poCJrUs0YgyHNtn1no=
 github.com/abdullin/seq v0.0.0-20160510034733-d5467c17e7af/go.mod h1:5Jv4cbFiHJMsVxt52+i0Ha45fjshj6wxYr1r19tB9bw=
