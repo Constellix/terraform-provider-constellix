@@ -7,6 +7,7 @@ import (
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func datasourceConstellixDNSCheck() *schema.Resource {
@@ -40,16 +41,37 @@ func datasourceConstellixDNSCheck() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"THIRTYSECONDS",
+					"ONEMINUTE",
+					"TWOMINUTES",
+					"THREEMINUTES",
+					"FOURMINUTES",
+					"FIVEMINUTES",
+					"TENMINUTES",
+					"THIRTYMINUTES",
+					"HALFDAY",
+					"DAY",
+				}, false),
 			},
 			"interval_policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"PARALLEL",
+					"ONCEPERSITE",
+					"ONCEPERREGION",
+				}, false),
 			},
 			"verification_policy": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"SIMPLE",
+					"MAJORITY",
+				}, false),
 			},
 			"expected_response": &schema.Schema{
 				Type:     schema.TypeString,
