@@ -142,7 +142,7 @@ func resourceConstellixTCPCheckCreate(d *schema.ResourceData, m interface{}) err
 
 	resp, err := client.Save(tcpcheckAttr, "https://api.sonar.constellix.com/rest/api/tcp")
 	if err != nil {
-		return nil
+		return err
 	}
 
 	var location string

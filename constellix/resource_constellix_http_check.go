@@ -168,7 +168,7 @@ func resourceConstellixHTTPCheckCreate(d *schema.ResourceData, m interface{}) er
 
 	resp, err := client.Save(httpcheckAttr, "https://api.sonar.constellix.com/rest/api/http")
 	if err != nil {
-		return nil
+		return err
 	}
 
 	var location string
