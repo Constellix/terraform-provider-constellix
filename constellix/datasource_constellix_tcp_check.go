@@ -117,7 +117,7 @@ func datasourceConstellixTCPCheckRead(d *schema.ResourceData, m interface{}) err
 		tp = val.(map[string]interface{})
 		if name == tp["name"].(string) {
 			flag = true
-			d.Set("id", tp["id"])
+			d.SetId(fmt.Sprintf("%v", tp["id"]))
 			d.Set("name", tp["name"])
 			d.Set("host", tp["host"])
 			d.Set("ip_version", tp["ipVersion"])
@@ -125,6 +125,7 @@ func datasourceConstellixTCPCheckRead(d *schema.ResourceData, m interface{}) err
 			d.Set("check_sites", tp["checkSites"])
 			d.Set("interval", tp["interval"])
 			d.Set("interval_policy", tp["monitorIntervalPolicy"])
+			d.Set("verification_policy", tp["verificationPolicy"])
 			d.Set("string_to_send", tp["stringToSend"])
 			d.Set("string_to_receive", tp["stringToReceive"])
 		}

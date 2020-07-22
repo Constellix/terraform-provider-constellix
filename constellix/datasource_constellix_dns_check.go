@@ -33,9 +33,10 @@ func datasourceConstellixDNSCheck() *schema.Resource {
 			},
 
 			"check_sites": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 			"interval": &schema.Schema{
 				Type:     schema.TypeString,
@@ -105,7 +106,8 @@ func datasourceConstellixDNSCheckRead(d *schema.ResourceData, m interface{}) err
 		tp = val.(map[string]interface{})
 		if tp["name"].(string) == name {
 			flag = true
-			d.Set("id", tp["id"])
+
+			d.SetId(fmt.Sprintf("%v", tp["id"]))
 			d.Set("name", tp["name"])
 			d.Set("fqdn", tp["fqdn"])
 			d.Set("resolver", tp["resolver"])
