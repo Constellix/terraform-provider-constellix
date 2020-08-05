@@ -1,4 +1,8 @@
-## 0.2.0 (Unreleased)
+## 0.1.2 (Unreleased)
+
+BUG FIXES:
+
+- Changed the parameter name for failover checks in CNAME record to check_id. In earlier versions it was checkidrcdf.
 ## 0.1.1 (July 24, 2020)
 
 IMPROVEMENTS:

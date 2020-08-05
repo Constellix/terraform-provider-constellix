@@ -117,7 +117,7 @@ func resourceConstellixCNameRecord() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"checkidrcdf": &schema.Schema{
+						"check_id": &schema.Schema{
 							Type:     schema.TypeInt,
 							Optional: true,
 							Computed: true,
@@ -225,7 +225,7 @@ func resourceConstellixCNameRecordCreate(d *schema.ResourceData, m interface{}) 
 		for _, val := range tp {
 			map1 := make(map[string]interface{})
 			inner := val.(map[string]interface{})
-			map1["checkid"] = fmt.Sprintf("%v", inner["checkidrcdf"])
+			map1["checkId"] = fmt.Sprintf("%v", inner["check_id"])
 			map1["value"] = fmt.Sprintf("%v", inner["value"])
 			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
@@ -318,6 +318,7 @@ func resourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) er
 			map1["value"] = fmt.Sprintf("%v", val1["value"])
 			map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
 			map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+			map1["check_id"] = fmt.Sprintf("%v", val1["checkId"])
 			rcdflist = append(rcdflist, map1)
 		}
 	}
@@ -408,7 +409,7 @@ func resourceConstellixCNameRecordUpdate(d *schema.ResourceData, m interface{}) 
 		for _, val := range tp {
 			map1 := make(map[string]interface{})
 			inner := val.(map[string]interface{})
-			map1["checkid"] = fmt.Sprintf("%v", inner["checkidrcdf"])
+			map1["checkId"] = fmt.Sprintf("%v", inner["check_id"])
 			map1["value"] = fmt.Sprintf("%v", inner["value"])
 			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
