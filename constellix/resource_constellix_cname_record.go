@@ -133,7 +133,6 @@ func resourceConstellixCNameRecord() *schema.Resource {
 					},
 				},
 				Optional: true,
-				Computed: true,
 			},
 
 			"record_failover_failover_type": &schema.Schema{

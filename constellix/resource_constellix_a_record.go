@@ -165,7 +165,6 @@ func resourceConstellixARecord() *schema.Resource {
 					},
 				},
 				Optional: true,
-				Computed: true,
 			},
 
 			"record_failover_failover_type": &schema.Schema{
@@ -283,7 +282,7 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 		for _, val := range tp {
 			map1 := make(map[string]interface{})
 			inner := val.(map[string]interface{})
-			map1["checkid"] = fmt.Sprintf("%v", inner["check_id"])
+			map1["checkId"] = fmt.Sprintf("%v", inner["check_id"])
 			map1["value"] = fmt.Sprintf("%v", inner["value"])
 			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
@@ -402,6 +401,7 @@ func resourceConstellixARecordRead(d *schema.ResourceData, m interface{}) error 
 			map1["value"] = fmt.Sprintf("%v", val1["value"])
 			map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
 			map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+			map1["check_id"] = fmt.Sprintf("%v", val1["checkId"])
 			rcdflist = append(rcdflist, map1)
 		}
 	}
@@ -520,7 +520,7 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 		for _, val := range tp {
 			map1 := make(map[string]interface{})
 			inner := val.(map[string]interface{})
-			map1["checkid"] = fmt.Sprintf("%v", inner["check_id"])
+			map1["checkId"] = fmt.Sprintf("%v", inner["check_id"])
 			map1["value"] = fmt.Sprintf("%v", inner["value"])
 			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
