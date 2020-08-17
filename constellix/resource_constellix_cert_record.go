@@ -210,17 +210,17 @@ func resourceConstellixCertUpdate(d *schema.ResourceData, m interface{}) error {
 
 	CertAttr.GtdRegion = d.Get("gtd_region").(int)
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		CertAttr.Type = d.Get("type").(string)
 	}
 
 	CertAttr.ParentID = d.Get("parentid").(int)
 
-	if d.HasChange("parent") {
+	if _, ok := d.GetOk("parent"); ok {
 		CertAttr.Parent = d.Get("parent").(string)
 	}
 
-	if d.HasChange("source") {
+	if _, ok := d.GetOk("source"); ok {
 		CertAttr.Source = d.Get("source").(string)
 	}
 

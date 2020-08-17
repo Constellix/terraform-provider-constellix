@@ -203,19 +203,19 @@ func resourceConstellixHTTPRedirectionUpdate(d *schema.ResourceData, m interface
 
 	httpAttr.NoAnswer = d.Get("noanswer").(bool)
 
-	if d.HasChange("title") {
+	if _, ok := d.GetOk("title"); ok {
 		httpAttr.Title = d.Get("title").(string)
 	}
 
-	if d.HasChange("keywords") {
+	if _, ok := d.GetOk("keywords"); ok {
 		httpAttr.Keywords = d.Get("keywords").(string)
 	}
 
-	if d.HasChange("description") {
+	if _, ok := d.GetOk("description"); ok {
 		httpAttr.Description = d.Get("description").(string)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		httpAttr.Note = d.Get("note").(string)
 	}
 
@@ -227,7 +227,7 @@ func resourceConstellixHTTPRedirectionUpdate(d *schema.ResourceData, m interface
 		httpAttr.URL = url.(string)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		httpAttr.Type = d.Get("type").(string)
 	}
 
@@ -241,11 +241,11 @@ func resourceConstellixHTTPRedirectionUpdate(d *schema.ResourceData, m interface
 		httpAttr.ParentID = pid.(int)
 	}
 
-	if d.HasChange("parent") {
+	if _, ok := d.GetOk("parent"); ok {
 		httpAttr.Parent = d.Get("parent").(string)
 	}
 
-	if d.HasChange("source") {
+	if _, ok := d.GetOk("source"); ok {
 		httpAttr.Source = d.Get("source").(string)
 	}
 

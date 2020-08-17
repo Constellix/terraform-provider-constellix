@@ -196,31 +196,31 @@ func resourceConstellixRPUpdate(d *schema.ResourceData, m interface{}) error {
 		rpAttr.TTL = ttl.(int)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 		rpAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		rpAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		rpAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		rpAttr.Type = d.Get("type").(string)
 	}
 
-	if d.HasChange("parentid") {
+	if _, ok := d.GetOk("parentid"); ok {
 		rpAttr.ParentId = d.Get("parentid").(int)
 	}
 
-	if d.HasChange("parent") {
+	if _, ok := d.GetOk("parent"); ok {
 		rpAttr.Parent = d.Get("parent").(string)
 	}
 
-	if d.HasChange("source") {
+	if _, ok := d.GetOk("source"); ok {
 		rpAttr.Source = d.Get("source").(string)
 	}
 

@@ -64,7 +64,7 @@ func resourceConstellixTagsUpdate(d *schema.ResourceData, m interface{}) error {
 
 	model := models.Tags{}
 
-	if d.HasChange("name") {
+	if _, ok := d.GetOk("name"); ok {
 		model.Name = d.Get("name").(string)
 	}
 

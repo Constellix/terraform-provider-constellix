@@ -159,11 +159,11 @@ func resourceConstellixAAAAPoolUpdate(d *schema.ResourceData, m interface{}) err
 
 	aaaapoolAttr := models.AAAArecordPoolAttributes{}
 
-	if d.HasChange("name") {
+	if _, ok := d.GetOk("name"); ok {
 		aaaapoolAttr.Name = d.Get("name").(string)
 	}
 
-	if d.HasChange("num_return") {
+	if _, ok := d.GetOk("num_return"); ok {
 		aaaapoolAttr.NumReturn = d.Get("num_return").(int)
 	}
 
@@ -171,15 +171,15 @@ func resourceConstellixAAAAPoolUpdate(d *schema.ResourceData, m interface{}) err
 		aaaapoolAttr.MinavailFailover = minaf.(int)
 	}
 
-	if d.HasChange("failed_flag") {
+	if _, ok := d.GetOk("failed_flag"); ok {
 		aaaapoolAttr.Failedflag = d.Get("failed_flag").(bool)
 	}
 
-	if d.HasChange("disable_flag") {
+	if _, ok := d.GetOk("disable_flag"); ok {
 		aaaapoolAttr.Disableflag = d.Get("disable_flag").(bool)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		aaaapoolAttr.Note = d.Get("note").(string)
 	}
 

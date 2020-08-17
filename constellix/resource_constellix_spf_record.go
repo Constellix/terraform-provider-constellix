@@ -162,15 +162,15 @@ func resourceConstellixSpfUpdate(d *schema.ResourceData, m interface{}) error {
 		SpfAttr.NoAnswer = noans.(bool)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		SpfAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		SpfAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		SpfAttr.Type = d.Get("type").(string)
 	}
 

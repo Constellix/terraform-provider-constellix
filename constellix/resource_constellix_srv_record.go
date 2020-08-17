@@ -216,27 +216,27 @@ func resourceConstellixSRVRecordUpdate(d *schema.ResourceData, m interface{}) er
 
 	srvAttr := models.SRVAttributes{}
 
-	if d.HasChange("name") {
+	if _, ok := d.GetOk("name"); ok {
 		srvAttr.Name = d.Get("name").(string)
 	}
 
-	if d.HasChange("ttl") {
+	if _, ok := d.GetOk("ttl"); ok {
 		srvAttr.TTL = d.Get("ttl").(int)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 		srvAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		srvAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		srvAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		srvAttr.Type = d.Get("type").(string)
 	}
 

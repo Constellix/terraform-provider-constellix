@@ -259,7 +259,7 @@ func resourceConstellixIPFilterUpdate(d *schema.ResourceData, m interface{}) err
 	if asn, ok := d.GetOk("asn"); ok {
 		ipfilterattr.Asn = toListOfInt(asn)
 	}
-	if d.HasChange("filter_rules_limit") {
+	if _, ok := d.GetOk("filter_rules_limit"); ok {
 
 		ipfilterattr.FilterRulesLimit = d.Get("filter_rules_limit").(int)
 	}

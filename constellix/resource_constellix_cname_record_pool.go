@@ -172,19 +172,19 @@ func resourceConstellixCnameRecordPoolUpdate(d *schema.ResourceData, m interface
 
 	cnamerecordpoolAttr.MinAvailableFailover = d.Get("min_available_failover").(int)
 
-	if d.HasChange("failed_flag") {
+	if _, ok := d.GetOk("failed_flag"); ok {
 		cnamerecordpoolAttr.FailedFlag = d.Get("failed_flag").(string)
 	}
 
-	if d.HasChange("disableflag1") {
+	if _, ok := d.GetOk("disableflag1"); ok {
 		cnamerecordpoolAttr.DisableFlag1 = d.Get("disableflag1").(string)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		cnamerecordpoolAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("version") {
+	if _, ok := d.GetOk("version"); ok {
 		cnamerecordpoolAttr.Version = d.Get("version").(int)
 	}
 	if rr, ok := d.GetOk("values"); ok {
