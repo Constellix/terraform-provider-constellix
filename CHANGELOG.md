@@ -1,4 +1,7 @@
-## 0.3.0 (Unreleased)
+## 0.2.2 (Unreleased)
+
+BUG FIXES:
+- Fixed the issue with name getting erased on updates.
 ## 0.2.1 (August 17, 2020)
 
 BUG FIXES:

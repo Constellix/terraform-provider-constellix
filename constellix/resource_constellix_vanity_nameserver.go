@@ -110,11 +110,11 @@ func resourceConstellixVanityNameserverUpdate(d *schema.ResourceData, m interfac
 		model.Name = name.(string)
 	}
 
-	if d.HasChange("is_default") {
+	if _, ok := d.GetOk("is_default"); ok {
 		model.IsDefault = d.Get("is_default").(bool)
 	}
 
-	if d.HasChange("is_public") {
+	if _, ok := d.GetOk("is_public"); ok {
 		model.IsDefault = d.Get("is_public").(bool)
 	}
 
@@ -122,7 +122,7 @@ func resourceConstellixVanityNameserverUpdate(d *schema.ResourceData, m interfac
 		model.NameserverGroup = group.(int)
 	}
 
-	if d.HasChange("nameserver_group_name") {
+	if _, ok := d.GetOk("nameserver_group_name"); ok {
 		model.NameserverGroupName = d.Get("nameserver_group_name").(string)
 	}
 

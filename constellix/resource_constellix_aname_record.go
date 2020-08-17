@@ -329,7 +329,7 @@ func resourceConstellixANAMERecordUpdate(d *schema.ResourceData, m interface{}) 
 		anameAttr.TTL = value.(int)
 	}
 
-	if d.HasChange("record_option") {
+	if _, ok := d.GetOk("record_option"); ok {
 		anameAttr.RecordOption = d.Get("record_option").(string)
 	}
 
@@ -337,23 +337,23 @@ func resourceConstellixANAMERecordUpdate(d *schema.ResourceData, m interface{}) 
 		anameAttr.Name = name.(string)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 		anameAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		anameAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		anameAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		anameAttr.Type = d.Get("type").(string)
 	}
 
-	if d.HasChange("contact_ids") {
+	if _, ok := d.GetOk("contact_ids"); ok {
 
 		contactidslist := toStringList(d.Get("contact_ids").([]interface{}))
 		var intlist []int

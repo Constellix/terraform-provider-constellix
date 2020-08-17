@@ -178,7 +178,7 @@ func resourceConstellixNAPTRUpdate(d *schema.ResourceData, m interface{}) error 
 		naptrAttr.Ttl = ttl.(int)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 
 		naptrAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
@@ -186,11 +186,11 @@ func resourceConstellixNAPTRUpdate(d *schema.ResourceData, m interface{}) error 
 	if note, ok := d.GetOk("note"); ok {
 		naptrAttr.Note = note.(string)
 	}
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 
 		naptrAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 
 		naptrAttr.Type = d.Get("type").(string)
 	}

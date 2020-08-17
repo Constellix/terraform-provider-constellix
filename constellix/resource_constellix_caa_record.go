@@ -179,7 +179,7 @@ func resourceConstellixCaaUpdate(d *schema.ResourceData, m interface{}) error {
 		caaAttr.TTL = ttl.(int)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 		caaAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
 
@@ -187,11 +187,11 @@ func resourceConstellixCaaUpdate(d *schema.ResourceData, m interface{}) error {
 		caaAttr.Note = note.(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		caaAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		caaAttr.Type = d.Get("type").(string)
 	}
 

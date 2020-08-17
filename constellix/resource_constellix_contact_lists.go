@@ -72,7 +72,7 @@ func resourceConstellixcontactListUpdate(d *schema.ResourceData, m interface{}) 
 
 	contactlistAttr.Name = d.Get("name").(string)
 
-	if d.HasChange("email_addresses") {
+	if _, ok := d.GetOk("email_addresses"); ok {
 		contactemaillist := toListOfString(d.Get("email_addresses"))
 		contactlistAttr.EmailAddresses = contactemaillist
 

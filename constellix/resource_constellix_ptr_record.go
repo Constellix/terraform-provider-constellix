@@ -195,27 +195,27 @@ func resourceConstellixPtrUpdate(d *schema.ResourceData, m interface{}) error {
 		PtrAttr.NoAnswer = noans.(string)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		PtrAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		PtrAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		PtrAttr.Type = d.Get("type").(string)
 	}
 
-	if d.HasChange("parentid") {
+	if _, ok := d.GetOk("parentid"); ok {
 		PtrAttr.ParentID = d.Get("parentid").(int)
 	}
 
-	if d.HasChange("parent") {
+	if _, ok := d.GetOk("parent"); ok {
 		PtrAttr.Parent = d.Get("parent").(string)
 	}
 
-	if d.HasChange("source") {
+	if _, ok := d.GetOk("source"); ok {
 		PtrAttr.Source = d.Get("source").(string)
 	}
 

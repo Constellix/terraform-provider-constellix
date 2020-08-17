@@ -174,19 +174,19 @@ func resourceConstellixARecordPoolUpdate(d *schema.ResourceData, m interface{}) 
 
 	arecordpoolAttr.MinAvailableFailover = d.Get("min_available_failover").(int)
 
-	if d.HasChange("failed_flag") {
+	if _, ok := d.GetOk("failed_flag"); ok {
 		arecordpoolAttr.FailedFlag = d.Get("failed_flag").(string)
 	}
 
-	if d.HasChange("disable_flag") {
+	if _, ok := d.GetOk("disable_flag"); ok {
 		arecordpoolAttr.DisableFlag1 = d.Get("disable_flag").(string)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		arecordpoolAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("version") {
+	if _, ok := d.GetOk("version"); ok {
 		arecordpoolAttr.Version = d.Get("version").(int)
 	}
 

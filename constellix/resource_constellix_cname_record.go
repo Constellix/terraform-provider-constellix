@@ -357,7 +357,7 @@ func resourceConstellixCNameRecordUpdate(d *schema.ResourceData, m interface{}) 
 		aAttr.RecordOption = recordoption.(string)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 		aAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
 
@@ -365,11 +365,11 @@ func resourceConstellixCNameRecordUpdate(d *schema.ResourceData, m interface{}) 
 		aAttr.Note = note.(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		aAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		aAttr.Type = d.Get("type").(string)
 	}
 	if contactid, ok := d.GetOk("contact_ids"); ok {

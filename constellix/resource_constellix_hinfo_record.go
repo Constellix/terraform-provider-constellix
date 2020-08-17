@@ -166,19 +166,19 @@ func resourceConstellixHinfoUpdate(d *schema.ResourceData, m interface{}) error 
 		hinfoAttr.TTL = ttl.(int)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 		hinfoAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		hinfoAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		hinfoAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		hinfoAttr.Type = d.Get("type").(string)
 	}
 

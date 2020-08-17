@@ -257,15 +257,15 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 
 	domainAttr.HasGeoIP = d.Get("has_geoip").(bool)
 
-	if d.HasChange("nameserver_group") {
+	if _, ok := d.GetOk("nameserver_group"); ok {
 		domainAttr.NameserverGroup = d.Get("nameserver_group").(string)
 	}
 
-	if d.HasChange("note") {
+	if _, ok := d.GetOk("note"); ok {
 		domainAttr.Note = d.Get("note").(string)
 	}
 
-	if d.HasChange("tags") {
+	if _, ok := d.GetOk("tags"); ok {
 		tagsList := d.Get("tags").([]interface{})
 		domainAttr.Tags = tagsList
 	}

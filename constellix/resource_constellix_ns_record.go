@@ -151,7 +151,7 @@ func resourceConstellixNSUpdate(d *schema.ResourceData, m interface{}) error {
 		nsAttr.Ttl = ttl.(int)
 	}
 
-	if d.HasChange("noanswer") {
+	if _, ok := d.GetOk("noanswer"); ok {
 		nsAttr.NoAnswer = d.Get("noanswer").(bool)
 	}
 
@@ -159,11 +159,11 @@ func resourceConstellixNSUpdate(d *schema.ResourceData, m interface{}) error {
 		nsAttr.Note = note.(string)
 	}
 
-	if d.HasChange("gtd_region") {
+	if _, ok := d.GetOk("gtd_region"); ok {
 		nsAttr.GtdRegion = d.Get("gtd_region").(int)
 	}
 
-	if d.HasChange("type") {
+	if _, ok := d.GetOk("type"); ok {
 		nsAttr.Type = d.Get("type").(string)
 	}
 
