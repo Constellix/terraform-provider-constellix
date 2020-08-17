@@ -1,4 +1,4 @@
-## 0.2.1 (Unreleased)
+## 0.2.1 (August 17, 2020)
 
 BUG FIXES:
 - Fixed an issue with checks not getting saved with the record.
