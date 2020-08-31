@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -17,6 +19,10 @@ func resourceConstellixNAPTR() *schema.Resource {
 		Read:   resourceConstellixNAPTRRead,
 		Update: resourceConstellixNAPTRUpdate,
 		Delete: resourceConstellixNAPTRDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixNAPTRImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
@@ -94,6 +100,56 @@ func resourceConstellixNAPTR() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixNAPTRImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	params := strings.Split(d.Id(), ":")
+	resp, err := constellixClient.GetbyId("v1/" + params[0] + "/" + params[1] + "/records/naptr/" + params[2])
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodyString), &data)
+
+	arecroundrobin := data["roundRobin"].([]interface{})
+	rrlist := make([]interface{}, 0, 1)
+	for _, valrrf := range arecroundrobin {
+		map1 := make(map[string]interface{})
+		val1 := valrrf.(map[string]interface{})
+		map1["order"] = fmt.Sprintf("%v", val1["order"])
+		map1["preference"] = fmt.Sprintf("%v", val1["preference"])
+		map1["flags"] = fmt.Sprintf("%v", val1["flags"])
+		map1["service"] = fmt.Sprintf("%v", val1["service"])
+		map1["regular_expression"] = fmt.Sprintf("%v", val1["regularExpression"])
+		map1["replacement"] = fmt.Sprintf("%v", val1["replacement"])
+		map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+
+		rrlist = append(rrlist, map1)
+	}
+
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("roundrobin", rrlist)
+	d.Set("name", data["name"])
+	d.Set("ttl", data["ttl"])
+	d.Set("noanswer", data["noAnswer"])
+	d.Set("note", data["note"])
+	d.Set("gtd_region", data["gtdRegion"])
+	d.Set("type", data["type"])
+	d.Set("domain_id", params[1])
+	d.Set("source_type", params[0])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixNAPTRCreate(d *schema.ResourceData, m interface{}) error {
@@ -257,7 +313,7 @@ func resourceConstellixNAPTRRead(d *schema.ResourceData, m interface{}) error {
 		rrlist = append(rrlist, map1)
 	}
 
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("roundrobin", rrlist)
 	d.Set("name", data["name"])
 	d.Set("ttl", data["ttl"])

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -19,6 +20,10 @@ func resourceConstellixCert() *schema.Resource {
 		Update: resourceConstellixCertUpdate,
 		Read:   resourceConstellixCertRead,
 		Delete: resourceConstellixCertDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixCertImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
@@ -116,6 +121,59 @@ func resourceConstellixCert() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixCertImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	params := strings.Split(d.Id(), ":")
+	resp, err := constellixClient.GetbyId("v1/" + params[0] + "/" + params[1] + "/records/cert/" + params[2])
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("domain_id", params[1])
+	d.Set("source_type", params[0])
+	d.Set("ttl", data["ttl"])
+	d.Set("noanswer", data["noAnswer"])
+	d.Set("note", data["note"])
+	d.Set("gtd_region", data["gtdRegion"])
+	d.Set("type", data["type"])
+	d.Set("parentid", data["parentId"])
+	d.Set("parent", data["parent"])
+	d.Set("source", data["source"])
+
+	resrr := (data["roundRobin"]).([]interface{})
+	mapListRR := make([]interface{}, 0, 1)
+	for _, val := range resrr {
+		log.Println("RR are : ", val)
+		tpMap := make(map[string]interface{})
+		inner := val.(map[string]interface{})
+		tpMap["certificate_type"], _ = strconv.Atoi(fmt.Sprintf("%d", inner["certificateType"]))
+		tpMap["key_tag"], _ = strconv.Atoi(fmt.Sprintf("%d", inner["keyTag"]))
+		tpMap["disable_flag"] = fmt.Sprintf("%v", inner["disableFlag"])
+		tpMap["algorithm"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["algorithm"]))
+		sEnc, _ := b64.StdEncoding.DecodeString(fmt.Sprintf("%v", inner["certificate"]))
+		tpMap["certificate"] = sEnc
+		mapListRR = append(mapListRR, tpMap)
+	}
+
+	d.Set("roundrobin", mapListRR)
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixCertCreate(d *schema.ResourceData, m interface{}) error {
@@ -273,7 +331,7 @@ func resourceConstellixCertRead(d *schema.ResourceData, m interface{}) error {
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("ttl", data["ttl"])
 	d.Set("noanswer", data["noAnswer"])

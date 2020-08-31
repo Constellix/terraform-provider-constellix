@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
 
 	"github.com/Constellix/constellix-go-client/client"
@@ -17,6 +18,10 @@ func resourceConstellixDomain() *schema.Resource {
 		Update: resourceConstellixDNSUpdate,
 		Read:   resourceConstellixDNSRead,
 		Delete: resourceConstellixDNSDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixDNSImport,
+		},
 
 		SchemaVersion: 1,
 
@@ -114,6 +119,55 @@ func resourceConstellixDomain() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	resp, err := constellixClient.GetbyId("v1/domains/" + d.Id())
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodyString), &data)
+	recsoa := data["soa"].(map[string]interface{})
+
+	soaset := make(map[string]interface{})
+	soaset["primary_nameserver"] = recsoa["primaryNameserver"]
+	soaset["ttl"] = fmt.Sprintf("%v", recsoa["ttl"])
+	if value, ok := d.GetOk("soa"); ok {
+		tp := value.(map[string]interface{})
+		if tp["email"] != nil {
+			soaset["email"] = recsoa["email"]
+		}
+	}
+	soaset["refresh"] = fmt.Sprintf("%v", recsoa["refresh"])
+	soaset["expire"] = fmt.Sprintf("%v", recsoa["expire"])
+	soaset["retry"] = fmt.Sprintf("%v", recsoa["retry"])
+	soaset["negcache"] = fmt.Sprintf("%v", recsoa["negCache"])
+
+	d.Set("id", data["id"])
+	d.Set("name", data["name"])
+	d.Set("soa", soaset)
+	d.Set("typeid", data["typeId"])
+	d.Set("has_geoip", data["hasGeoIP"])
+	d.Set("has_gtd_regions", data["hasGtdRegions"])
+	d.Set("nameserver_group", data["nameserverGroup"])
+	d.Set("note", data["note"])
+	d.Set("version", data["version"])
+	d.Set("status", data["status"])
+	d.Set("tags", data["tags"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {

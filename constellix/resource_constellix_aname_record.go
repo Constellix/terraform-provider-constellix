@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -18,6 +20,9 @@ func resourceConstellixANAMERecord() *schema.Resource {
 		Update:        resourceConstellixANAMERecordUpdate,
 		Delete:        resourceConstellixANAMERecordDelete,
 		SchemaVersion: 1,
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixANAMERecordImport,
+		},
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -133,6 +138,80 @@ func resourceConstellixANAMERecord() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixANAMERecordImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	params := strings.Split(d.Id(), ":")
+	resp, err := constellixClient.GetbyId("v1/" + params[0] + "/" + params[1] + "/records/aname/" + params[2])
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	err = json.Unmarshal([]byte(bodyString), &data)
+	if err != nil {
+		return nil, err
+	}
+
+	arecroundrobin := data["roundRobin"].([]interface{})
+	rrlist := make([]interface{}, 0, 1)
+	for _, valrrf := range arecroundrobin {
+		map1 := make(map[string]interface{})
+		val1 := valrrf.(map[string]interface{})
+		map1["value"] = fmt.Sprintf("%v", val1["value"])
+		map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+		rrlist = append(rrlist, map1)
+	}
+	log.Printf("tttttt %v", rrlist)
+
+	rcdf := data["recordFailover"]
+	rcdfSet := make(map[string]interface{})
+	rcdflist := make([]interface{}, 0, 1)
+	if rcdf != nil {
+		rcdf1 := rcdf.(map[string]interface{})
+		rcdfSet["record_failover_failover_type"] = fmt.Sprintf("%v", rcdf1["failoverType"])
+		rcdfSet["record_failover_disable_flag"] = fmt.Sprintf("%v", rcdf1["disabled"])
+
+		rcdfValues := rcdf1["values"].([]interface{})
+
+		for _, valrcdf := range rcdfValues {
+			map1 := make(map[string]interface{})
+			val1 := valrcdf.(map[string]interface{})
+			map1["value"] = fmt.Sprintf("%v", val1["value"])
+			map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
+			map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+			map1["check_id"] = fmt.Sprintf("%v", val1["checkId"])
+			rcdflist = append(rcdflist, map1)
+		}
+	}
+
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("ttl", data["ttl"])
+	d.Set("domain_id", params[1])
+	d.Set("source_type", params[0])
+	d.Set("record_option", data["recordOption"])
+	d.Set("noanswer", data["noAnswer"])
+	d.Set("note", data["note"])
+	d.Set("gtd_region", data["gtdRegion"])
+	d.Set("type", data["type"])
+	d.Set("contact_ids", data["contactids"])
+	d.Set("roundrobin", rrlist)
+	d.Set("record_failover_values", rcdflist)
+	d.Set("record_failover_failover_type", rcdfSet["record_failover_failover_type"])
+	d.Set("record_failover_disable_flag", rcdfSet["record_failover_disable_flag"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixANAMERecordCreate(d *schema.ResourceData, m interface{}) error {
@@ -302,7 +381,7 @@ func resourceConstellixANAMERecordRead(d *schema.ResourceData, m interface{}) er
 		}
 	}
 
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("ttl", data["ttl"])
 	d.Set("record_option", data["recordOption"])

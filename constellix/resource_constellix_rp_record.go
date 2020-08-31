@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -16,6 +18,10 @@ func resourceConstellixRP() *schema.Resource {
 		Update: resourceConstellixRPUpdate,
 		Read:   resourceConstellixRPRead,
 		Delete: resourceConstellixRPDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixRPImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
@@ -106,6 +112,58 @@ func resourceConstellixRP() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixRPImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	params := strings.Split(d.Id(), ":")
+	resp, err := constellixClient.GetbyId("v1/" + params[0] + "/" + params[1] + "/records/rp/" + params[2])
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("ttl", data["ttl"])
+	d.Set("noanswer", data["noAnswer"])
+	d.Set("note", data["note"])
+	d.Set("gtd_region", data["gtdRegion"])
+	d.Set("type", data["type"])
+	d.Set("parentid", data["parentId"])
+	d.Set("parent", data["parent"])
+	d.Set("source", data["source"])
+
+	resrr := (data["roundRobin"]).([]interface{})
+	mapListRR := make([]interface{}, 0, 1)
+	length := len(resrr)
+	for _, val := range resrr {
+		tpMap := make(map[string]interface{})
+		inner := val.(map[string]interface{})
+		tpMap["mailbox"] = fmt.Sprintf("%v", inner["mailbox"])
+		tpMap["txt"] = fmt.Sprintf("%v", inner["txt"])
+		if length > 1 {
+			tpMap["disableFlag"] = fmt.Sprintf("%v", inner["disableFlag"])
+		}
+		mapListRR = append(mapListRR, tpMap)
+	}
+
+	d.Set("roundrobin", mapListRR)
+	d.Set("domain_id", params[1])
+	d.Set("source_type", params[0])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixRPCreate(d *schema.ResourceData, m interface{}) error {
@@ -270,7 +328,7 @@ func resourceConstellixRPRead(d *schema.ResourceData, m interface{}) error {
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("ttl", data["ttl"])
 	d.Set("noanswer", data["noAnswer"])

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -16,6 +17,10 @@ func resourceConstellixVanityNameserver() *schema.Resource {
 		Update: resourceConstellixVanityNameserverUpdate,
 		Read:   resourceConstellixVanityNameserverRead,
 		Delete: resourceConstellixVanityNameserverDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixVanityNameserverImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -52,6 +57,38 @@ func resourceConstellixVanityNameserver() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixVanityNameserverImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	dn := d.Id()
+
+	resp, err := constellixClient.GetbyId("v1/vanityNameservers/" + dn)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("is_default", data["isDefault"])
+	d.Set("is_public", data["isPublic"])
+	d.Set("nameserver_group", data["nameserverGroup"])
+	d.Set("nameserver_group_name", data["nameserverGroupName"])
+	d.Set("nameserver_list_string", data["nameserversListString"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixVanityNameserverCreate(d *schema.ResourceData, m interface{}) error {
@@ -159,7 +196,7 @@ func resourceConstellixVanityNameserverRead(d *schema.ResourceData, m interface{
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("is_default", data["isDefault"])
 	d.Set("is_public", data["isPublic"])

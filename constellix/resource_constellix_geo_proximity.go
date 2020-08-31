@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
 
 	"github.com/Constellix/constellix-go-client/client"
@@ -17,6 +18,10 @@ func resourceConstellixGeoProximity() *schema.Resource {
 		Update: resourceConstellixGeoProximityUpdate,
 		Read:   resourceConstellixGeoProximityRead,
 		Delete: resourceConstellixGeoProximityDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixGeoProximityImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -86,6 +91,36 @@ func resourceConstellixGeoProximity() *schema.Resource {
 	}
 }
 
+func resourceConstellixGeoProximityImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	geoproximityid := d.Id()
+
+	resp, err := constellixClient.GetbyId("v1/geoProximities/" + geoproximityid)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("country", data["country"])
+	d.Set("region", data["region"])
+	d.Set("latitude", data["latitude"])
+	d.Set("longitude", data["longitude"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
+}
 func resourceConstellixGeoProximityCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*client.Client)
 
@@ -177,7 +212,7 @@ func resourceConstellixGeoProximityRead(d *schema.ResourceData, m interface{}) e
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("country", data["country"])
 	d.Set("region", data["region"])

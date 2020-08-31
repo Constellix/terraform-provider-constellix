@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -16,6 +17,10 @@ func resourceConstellixIPFilter() *schema.Resource {
 		Read:   resourceConstellixIPFilterRead,
 		Update: resourceConstellixIPFilterUpdate,
 		Delete: resourceConstellixIPFilterDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixIPFilterImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -77,6 +82,79 @@ func resourceConstellixIPFilter() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixIPFilterImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	nsid := d.Id()
+
+	resp, err := constellixClient.GetbyId("v1/geoFilters/" + nsid)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodyString), &data)
+
+	resrr := data["regions"].([]interface{})
+
+	geoipregionsList := make([]string, 0)
+	for _, value := range resrr {
+		tp := value.(map[string]interface{})
+		str := fmt.Sprintf("%v", tp["countryCode"])
+		str1 := fmt.Sprintf("%v", tp["regionCode"])
+		if str != "" && str1 != "" {
+			geoip := str + "/" + str1
+			geoipregionsList = append(geoipregionsList, geoip)
+		}
+	}
+
+	ipaddr1 := data["ipAddresses"]
+
+	if ipaddr1 != nil {
+		ipaddr := ipaddr1.([]interface{})
+		for _, val := range ipaddr {
+
+			tp := val.(map[string]interface{})
+			if tp["ipv4Addresses"] != nil {
+				ipv4s := tp["ipv4Addresses"].([]interface{})
+				ipv4List := make([]string, 0, 1)
+				for _, val := range ipv4s {
+					temp := val.(map[string]interface{})["ipv4"]
+					ipv4List = append(ipv4List, temp.(string))
+				}
+				d.Set("ipv4", ipv4List)
+
+			} else {
+				ipv6s := tp["ipv6Addresses"].([]interface{})
+				ipv6List := make([]string, 0, 1)
+				for _, val := range ipv6s {
+					temp := val.(map[string]interface{})["ipv6"]
+					ipv6List = append(ipv6List, temp.(string))
+				}
+				d.Set("ipv6", ipv6List)
+
+			}
+		}
+	}
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("geoip_regions", geoipregionsList)
+	d.Set("name", data["name"])
+	d.Set("geoip_continents", data["geoipContinents"])
+	d.Set("geoip_countries", data["geoipCountries"])
+	d.Set("asn", data["asn"])
+	d.Set("filter_rules_limit", data["filterRulesLimit"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixIPFilterCreate(d *schema.ResourceData, m interface{}) error {
@@ -216,7 +294,7 @@ func resourceConstellixIPFilterRead(d *schema.ResourceData, m interface{}) error
 			}
 		}
 	}
-
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("geoip_regions", geoipregionsList)
 	d.Set("name", data["name"])
 	d.Set("geoip_continents", data["geoipContinents"])

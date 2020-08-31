@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -16,6 +17,10 @@ func resourceConstellixContactList() *schema.Resource {
 		Read:   resourceConstellixContactListRead,
 		Update: resourceConstellixcontactListUpdate,
 		Delete: resourceConstellixContactListDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixContactListImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -30,6 +35,33 @@ func resourceConstellixContactList() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixContactListImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	cid := d.Id()
+	resp, err := constellixClient.GetbyId("v2/contactLists/" + cid)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("email_addresses", data["emailAddresses"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixContactListCreate(d *schema.ResourceData, m interface{}) error {

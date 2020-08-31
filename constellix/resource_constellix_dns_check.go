@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
@@ -19,6 +20,9 @@ func resourceConstellixDNSCheck() *schema.Resource {
 		Update:        resourceConstellixDNSCheckUpdate,
 		Delete:        resourceConstellixDNSCheckDelete,
 		SchemaVersion: 1,
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixDNSCheckImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -88,6 +92,38 @@ func resourceConstellixDNSCheck() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixDNSCheckImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	dnsid := d.Id()
+	resp, err := constellixClient.GetbyId("https://api.sonar.constellix.com/rest/api/dns/" + dnsid)
+	defer resp.Body.Close()
+
+	if err != nil {
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("fqdn", data["fqdn"])
+	d.Set("resolver", data["resolver"])
+	d.Set("check_sites", data["checkSites"])
+	d.Set("interval", data["interval"])
+	d.Set("interval_policy", data["monitorIntervalPolicy"])
+	d.Set("verification_policy", data["verificationPolicy"])
+	d.Set("expected_response", data["expectedResponse"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixDNSCheckCreate(d *schema.ResourceData, m interface{}) error {
@@ -170,7 +206,7 @@ func resourceConstellixDNSCheckRead(d *schema.ResourceData, m interface{}) error
 	var data map[string]interface{}
 
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("fqdn", data["fqdn"])
 	d.Set("resolver", data["resolver"])

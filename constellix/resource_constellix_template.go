@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -16,6 +17,10 @@ func resourceConstellixTemplate() *schema.Resource {
 		Read:   resourceConstellixTemplateRead,
 		Update: resourceConstellixTemplateUpdate,
 		Delete: resourceConstellixTemplateDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixTemplateImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -46,6 +51,35 @@ func resourceConstellixTemplate() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixTemplateImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	dn := d.Id()
+	resp, err := constellixClient.GetbyId("v1/templates/" + dn)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodyString), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("domain", data["Domain"])
+	d.Set("name", data["name"])
+	d.Set("has_geoip", data["hasGeoIP"])
+	d.Set("has_gtd_regions", data["hasGtdRegions"])
+	d.Set("version", data["version"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixTemplateCreate(d *schema.ResourceData, m interface{}) error {
@@ -104,7 +138,7 @@ func resourceConstellixTemplateRead(d *schema.ResourceData, m interface{}) error
 	bodyString := string(bodyBytes)
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodyString), &data)
-
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("domain", data["Domain"])
 	d.Set("name", data["name"])
 	d.Set("has_geoip", data["hasGeoIP"])

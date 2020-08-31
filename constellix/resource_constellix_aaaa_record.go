@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -17,6 +19,9 @@ func resourceConstellixAAAARecord() *schema.Resource {
 		Update: resourceConstellixAAAARecordUpdate,
 		Read:   resourceConstellixAAAARecordRead,
 		Delete: resourceConstellixAAAARecordDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixAAAARecordImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
@@ -187,6 +192,111 @@ func resourceConstellixAAAARecord() *schema.Resource {
 	}
 }
 
+func resourceConstellixAAAARecordImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	params := strings.Split(d.Id(), ":")
+	resp, err := constellixClient.GetbyId("v1/" + params[0] + "/" + params[1] + "/records/aaaa/" + params[2])
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	err = json.Unmarshal([]byte(bodyString), &data)
+	if err != nil {
+		return nil, err
+	}
+
+	geoloc1 := data["geo_location"]
+	geoset := make(map[string]interface{})
+	if geoloc1 != nil {
+		geoloc := geoloc1.(map[string]interface{})
+		if geoloc["geoipFilter"] != nil {
+			geoset["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
+			geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		} else {
+			geoset["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
+		}
+	} else {
+		geoset = nil
+	}
+
+	arecroundrobin := data["roundRobin"].([]interface{})
+	rrlist := make([]interface{}, 0, 1)
+	for _, valrrf := range arecroundrobin {
+		map1 := make(map[string]interface{})
+		val1 := valrrf.(map[string]interface{})
+		map1["value"] = fmt.Sprintf("%v", val1["value"])
+		map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+
+		rrlist = append(rrlist, map1)
+	}
+
+	arecroundrobinfailover := data["roundRobinFailover"].([]interface{})
+
+	rrflist := make([]interface{}, 0, 1)
+	for _, valrrf := range arecroundrobinfailover {
+		map1 := make(map[string]interface{})
+		val1 := valrrf.(map[string]interface{})
+		map1["value"] = fmt.Sprintf("%v", val1["value"])
+		map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
+		map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+
+		rrflist = append(rrflist, map1)
+	}
+
+	rcdf := data["recordFailover"]
+	rcdfset := make(map[string]interface{})
+	rcdflist := make([]interface{}, 0, 1)
+	if rcdf != nil {
+		rcdf1 := rcdf.(map[string]interface{})
+		rcdfset["record_failover_failover_type"] = fmt.Sprintf("%v", rcdf1["failoverType"])
+
+		rcdfset["record_failover_disable_flag"] = fmt.Sprintf("%v", rcdf1["disabled"])
+
+		rcdfvalues := rcdf1["values"].([]interface{})
+
+		for _, valrcdf := range rcdfvalues {
+			map1 := make(map[string]interface{})
+			val1 := valrcdf.(map[string]interface{})
+			map1["value"] = fmt.Sprintf("%v", val1["value"])
+			map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
+			map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+			map1["check_id"] = fmt.Sprintf("%v", val1["checkId"])
+			rcdflist = append(rcdflist, map1)
+		}
+	}
+
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("domain_id", params[1])
+	d.Set("source_type", params[0])
+	d.Set("name", data["name"])
+	d.Set("ttl", data["ttl"])
+	d.Set("geo_location", geoset)
+	d.Set("record_option", data["recordOption"])
+	d.Set("noanswer", data["noAnswer"])
+	d.Set("note", data["note"])
+	d.Set("gtd_region", data["gtdRegion"])
+	d.Set("type", data["type"])
+	d.Set("pools", data["pools"])
+	d.Set("contact_ids", data["contactId"])
+	d.Set("roundrobin", rrlist)
+	d.Set("roundrobin_failover", rrflist)
+	d.Set("record_failover_values", rcdflist)
+	d.Set("record_failover_failover_type", rcdfset["record_failover_failover_type"])
+	d.Set("record_failover_disable_flag", rcdfset["record_failover_disable_flag"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
+}
+
 func resourceConstellixAAAARecordCreate(d *schema.ResourceData, m interface{}) error {
 
 	constellixConnect := m.(*client.Client)
@@ -250,7 +360,6 @@ func resourceConstellixAAAARecordCreate(d *schema.ResourceData, m interface{}) e
 			inner := val.(map[string]interface{})
 			map1["value"] = fmt.Sprintf("%v", inner["value"])
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
-			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			maplistrr = append(maplistrr, map1)
 		}
 		aAttr.RoundRobin = maplistrr
@@ -367,7 +476,6 @@ func resourceConstellixAAAARecordRead(d *schema.ResourceData, m interface{}) err
 		map1 := make(map[string]interface{})
 		val1 := valrrf.(map[string]interface{})
 		map1["value"] = fmt.Sprintf("%v", val1["value"])
-		map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
 		map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
 
 		rrlist = append(rrlist, map1)
@@ -408,7 +516,7 @@ func resourceConstellixAAAARecordRead(d *schema.ResourceData, m interface{}) err
 		}
 	}
 
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("ttl", data["ttl"])
 	d.Set("geo_location", geoset)
@@ -492,7 +600,6 @@ func resourceConstellixAAAARecordUpdate(d *schema.ResourceData, m interface{}) e
 			inner := val.(map[string]interface{})
 			map1["value"] = fmt.Sprintf("%v", inner["value"])
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
-			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			maplistrr = append(maplistrr, map1)
 		}
 		aAttr.RoundRobin = maplistrr
