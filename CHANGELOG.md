@@ -1,4 +1,4 @@
-## 0.3.0 (Unreleased)
+## 0.3.0 (September 01, 2020)
 
 IMPROVEMENTS:
 - Added Importer to all the resources.
