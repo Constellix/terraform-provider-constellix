@@ -46,3 +46,15 @@ resource "constellix_aaaa_record_pool" "firstrecord" {
 
 ## Attributes Reference
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the aaaa record pool resource.
+
+## Importing ##
+
+An existing Pool can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_aaaa_record_pool.example <pool-id>
+```
+
+Where pool-id is the Id of record calculated via Constellix API.

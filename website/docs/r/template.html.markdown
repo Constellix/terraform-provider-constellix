@@ -31,3 +31,15 @@ resource "constellix_template" "firsttemplate" {
 
 ## Attributes Reference
 No attributes are exported.
+
+## Importing ##
+
+An existing Template can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_template.example <template-id>
+```
+
+Where template-id is the Id of template calculated via Constellix API.

@@ -43,3 +43,15 @@ resource "constellix_domain" "domain1" {
 
 ## Attribute Reference ##
 No attributes are exported
+
+## Importing ##
+
+An existing Record can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_domain.example <record-id>
+```
+
+Where record-id is the Id of record calculated via Constellix API.

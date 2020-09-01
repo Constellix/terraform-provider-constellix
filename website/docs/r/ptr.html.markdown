@@ -43,3 +43,15 @@ resource "constellix_ptr_record" "ptr1" {
 
 ## Attributes Reference
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the PTR resource.
+
+## Importing ##
+
+An existing Record can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_ptr_record.example <source>:<parent-id>:<record-id>
+```
+
+Where source can be either domains or templates; parent-id is domain-id or template-id based on the source provided and record-id is the Id of record calculated via Constellix API.

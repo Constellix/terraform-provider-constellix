@@ -34,3 +34,15 @@ resource "constellix_dns_check" "first" {
 ## Attribute Reference ##
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of DNS check resource.
 
+
+## Importing ##
+
+An existing Check can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_dns_check.example <check-id>
+```
+
+Where check-id is the Id of check calculated via Constellix API.

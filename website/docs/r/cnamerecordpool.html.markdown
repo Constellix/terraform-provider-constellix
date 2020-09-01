@@ -47,3 +47,15 @@ resource "constellix_cname_record_pool" "firstrecord" {
 
 ## Attributes Reference
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the cname record pool resource.
+
+## Importing ##
+
+An existing pool can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_cname_record_pool.example <pool-id>
+```
+
+Where pool-id is the Id of pool calculated via Constellix API.

@@ -38,3 +38,15 @@ resource "constellix_geo_filter" "ipfilter1" {
 
 ## Attributes Reference
 No attributes are exported.
+
+## Importing ##
+
+An existing Geo Filter can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_geo_filter.example <filter-id>
+```
+
+Where filter-id is the Id of filter calculated via Constellix API.
