@@ -33,3 +33,15 @@ resource "constellix_vanity_nameserver" "vanitynameserver1" {
 
 ## Attribute Reference ##
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of vanitynameserver resource.
+
+## Importing ##
+
+An existing Vanity Name Server can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_vanity_nameserver.example <nameserver-id>
+```
+
+Where nameserver-id is the Id of nameserver calculated via Constellix API.

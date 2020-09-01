@@ -1,4 +1,7 @@
 ## 0.3.0 (Unreleased)
+
+IMPROVEMENTS:
+- Added Importer to all the resources.
 ## 0.2.2 (August 17, 2020)
 
 BUG FIXES:

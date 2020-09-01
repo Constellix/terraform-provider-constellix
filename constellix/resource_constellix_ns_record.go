@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -17,6 +19,10 @@ func resourceConstellixNS() *schema.Resource {
 		Read:   resourceConstellixNSRead,
 		Update: resourceConstellixNSUpdate,
 		Delete: resourceConstellixNSDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixNSImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
@@ -76,6 +82,50 @@ func resourceConstellixNS() *schema.Resource {
 	}
 }
 
+func resourceConstellixNSImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	params := strings.Split(d.Id(), ":")
+	resp, err := constellixClient.GetbyId("v1/" + params[0] + "/" + params[1] + "/records/ns/" + params[2])
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodyString), &data)
+
+	arecroundrobin := data["roundRobin"].([]interface{})
+	rrlist := make([]interface{}, 0, 1)
+	for _, valrrf := range arecroundrobin {
+		map1 := make(map[string]interface{})
+		val1 := valrrf.(map[string]interface{})
+		map1["value"] = fmt.Sprintf("%v", val1["value"])
+		map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+
+		rrlist = append(rrlist, map1)
+	}
+
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("roundrobin", rrlist)
+	d.Set("name", data["name"])
+	d.Set("ttl", data["ttl"])
+	d.Set("noanswer", data["noAnswer"])
+	d.Set("note", data["note"])
+	d.Set("gtd_region", data["gtdRegion"])
+	d.Set("type", data["type"])
+	d.Set("domain_id", params[1])
+	d.Set("source_type", params[0])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
+}
 func resourceConstellixNSCreate(d *schema.ResourceData, m interface{}) error {
 	constellixConnect := m.(*client.Client)
 
@@ -219,7 +269,7 @@ func resourceConstellixNSRead(d *schema.ResourceData, m interface{}) error {
 		rrlist = append(rrlist, map1)
 	}
 
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("roundrobin", rrlist)
 	d.Set("name", data["name"])
 	d.Set("ttl", data["ttl"])

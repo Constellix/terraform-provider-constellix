@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -17,6 +18,10 @@ func resourceConstellixHTTPRedirection() *schema.Resource {
 		Read:   resourceConstellixHTTPRedirectionRead,
 		Update: resourceConstellixHTTPRedirectionUpdate,
 		Delete: resourceConstellixHTTPRedirectionDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixHTTPRedirectionImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"domain_id": &schema.Schema{
@@ -111,6 +116,48 @@ func resourceConstellixHTTPRedirection() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixHTTPRedirectionImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	params := strings.Split(d.Id(), ":")
+	resp, err := constellixClient.GetbyId("v1/" + params[0] + "/" + params[1] + "/records/httpredirection/" + params[2])
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("ttl", data["ttl"])
+	d.Set("noanswer", data["noAnswer"])
+	d.Set("note", data["note"])
+	d.Set("gtd_region", data["gtdRegion"])
+	d.Set("type", data["type"])
+	d.Set("parentid", data["parentId"])
+	d.Set("parent", data["parent"])
+	d.Set("source", data["source"])
+	d.Set("title", data["title"])
+	d.Set("keywords", data["keywords"])
+	d.Set("description", data["description"])
+	d.Set("url", data["url"])
+	d.Set("hardlink_flag", data["hardlinkflag"])
+	d.Set("redirect_type_id", data["redirectTypeId"])
+	d.Set("domain_id", params[1])
+	d.Set("source_type", params[0])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixHTTPRedirectionCreate(d *schema.ResourceData, m interface{}) error {
@@ -281,7 +328,7 @@ func resourceConstellixHTTPRedirectionRead(d *schema.ResourceData, m interface{}
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("ttl", data["ttl"])
 	d.Set("noanswer", data["noAnswer"])

@@ -34,3 +34,15 @@ resource "constellix_geo_proximity" "firstgeoproximity" {
 
 ## Attributes Reference
 No attributes are exported.
+
+## Importing ##
+
+An existing Geo Proximity can be [imported][docs-import] into this resource using its Id, via the following command:
+[docs-import]: https://www.terraform.io/docs/import/index.html
+
+
+```
+terraform import constellix_geo_proximity.example <geoproxy-id>
+```
+
+Where geoproxy-id is the Id of geoproxy calculated via Constellix API.

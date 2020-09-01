@@ -18,6 +18,10 @@ func resourceConstellixTags() *schema.Resource {
 		Read:   resourceConstellixTagsRead,
 		Delete: resourceConstellixTagsDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixTagsImport,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -25,6 +29,32 @@ func resourceConstellixTags() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixTagsImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	dn := d.Id()
+	resp, err := constellixClient.GetbyId("v2/tags/" + dn)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixTagsCreate(d *schema.ResourceData, m interface{}) error {
@@ -96,7 +126,7 @@ func resourceConstellixTagsRead(d *schema.ResourceData, m interface{}) error {
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	return nil
 }

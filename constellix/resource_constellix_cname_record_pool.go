@@ -19,6 +19,10 @@ func resourceConstellixCnameRecordPool() *schema.Resource {
 		Read:   resourceConstellixCnameRecordPoolRead,
 		Delete: resourceConstellixCnameRecordPoolDelete,
 
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixCnameRecordPoolImport,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -93,6 +97,55 @@ func resourceConstellixCnameRecordPool() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixCnameRecordPoolImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	cnamerecordpoolid := d.Id()
+
+	resp, err := constellixClient.GetbyId("v1/pools/CNAME/" + cnamerecordpoolid)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil, err
+		}
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("num_return", data["numReturn"])
+	d.Set("min_available_failover", data["minAvailableFailover"])
+	d.Set("note", data["note"])
+	d.Set("version", data["version"])
+	d.Set("failed_flag", data["failedFlag"])
+	d.Set("disable_flag", data["disableFlag"])
+	resrr := (data["values"]).([]interface{})
+	mapListRR := make([]interface{}, 0, 1)
+	for _, val := range resrr {
+		log.Println("RR are : ", val)
+		tpMap := make(map[string]interface{})
+		inner := val.(map[string]interface{})
+		tpMap["value"] = fmt.Sprintf("%v", inner["value"])
+		tpMap["weight"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["weight"]))
+		tpMap["disableFlag"] = fmt.Sprintf("%v", inner["disableFlag"])
+		tpMap["policy"] = fmt.Sprintf("%v", inner["policy"])
+		tpMap["checkId"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["checkId"]))
+
+		mapListRR = append(mapListRR, tpMap)
+	}
+
+	d.Set("values", mapListRR)
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixCnameRecordPoolCreate(d *schema.ResourceData, m interface{}) error {
@@ -232,7 +285,7 @@ func resourceConstellixCnameRecordPoolRead(d *schema.ResourceData, m interface{}
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("num_return", data["numReturn"])
 	d.Set("min_available_failover", data["minAvailableFailover"])

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
@@ -18,6 +19,10 @@ func resourceConstellixHTTPCheck() *schema.Resource {
 		Read:   resourceConstellixHTTPCheckRead,
 		Update: resourceConstellixHTTPCheckUpdate,
 		Delete: resourceConstellixHTTPCheckDelete,
+
+		Importer: &schema.ResourceImporter{
+			State: resourceConstellixHTTPCheckImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -110,6 +115,41 @@ func resourceConstellixHTTPCheck() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceConstellixHTTPCheckImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	log.Printf("[DEBUG] %s: Beginning Import", d.Id())
+	constellixClient := m.(*client.Client)
+	dn := d.Id()
+
+	resp, err := constellixClient.GetbyId("https://api.sonar.constellix.com/rest/api/http/" + dn)
+	if err != nil {
+		return nil, err
+	}
+	bodybytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	bodystring := string(bodybytes)
+
+	var data map[string]interface{}
+	json.Unmarshal([]byte(bodystring), &data)
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	d.Set("name", data["name"])
+	d.Set("host", data["host"])
+	d.Set("protocol_type", data["protocolType"])
+	d.Set("ip_version", data["ipVersion"])
+	d.Set("port", data["port"])
+	d.Set("check_sites", data["checkSites"])
+	d.Set("interval", data["interval"])
+	d.Set("interval_policy", data["monitorIntervalPolicy"])
+	d.Set("verification_policy", data["verificationPolicy"])
+	d.Set("fqdn", data["fqdn"])
+	d.Set("path", data["path"])
+	d.Set("search_string", data["searchString"])
+	d.Set("expected_status_code", data["expectedStatusCode"])
+	log.Printf("[DEBUG] %s finished import", d.Id())
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceConstellixHTTPCheckCreate(d *schema.ResourceData, m interface{}) error {
@@ -257,7 +297,7 @@ func resourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) erro
 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
-	d.Set("id", data["id"])
+	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
 	d.Set("host", data["host"])
 	d.Set("protocol_type", data["protocolType"])
