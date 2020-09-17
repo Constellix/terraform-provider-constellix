@@ -1,4 +1,7 @@
-## 0.4.0 (Unreleased)
+## 0.3.1 (Unreleased)
+
+IMPROVEMENTS:
+- Round Robin is now optional for A record resource.
 ## 0.3.0 (September 01, 2020)
 
 IMPROVEMENTS:

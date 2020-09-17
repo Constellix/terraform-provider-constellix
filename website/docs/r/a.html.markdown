@@ -61,9 +61,9 @@ resource "constellix_a_record" "firstrecord" {
 ## Argument Reference ##
 * `source_type` - (Required) Type of the A record. The values which can be applied are "domains" or "templates".
 * `ttl` - (Required) TTL must be in between 0 and 2147483647.
-* `roundrobin` - (Required) Object.
-* `roundrobin.value` - (Required) IPv4 address.
-* `roundrobin.disable_flag` - (Required) enable or disable the roundrobin object. Default is false. Atleast one roundrobin object should be false.
+* `roundrobin` - (Optional) Object.
+* `roundrobin.value` - (Optional) IPv4 address.
+* `roundrobin.disable_flag` - (Optional) enable or disable the roundrobin object. Default is false. Atleast one roundrobin object should be false.
 * `name` - (Optional) Name of record. Name should be unique.
 * `geo_location` - (Optional) Details of IP filter / Geo proximity to be applied. Default is null.
 * `geo_location.geo_ip_user_region` - (Optional) For Geo proximity to be applied. geoipUserRegion should not be provided.

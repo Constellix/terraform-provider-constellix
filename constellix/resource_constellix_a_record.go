@@ -122,7 +122,8 @@ func resourceConstellixARecord() *schema.Resource {
 						},
 					},
 				},
-				Required: true,
+				Optional: true,
+				Computed: true,
 			},
 			"roundrobin_failover": &schema.Schema{
 				Type: schema.TypeSet,
