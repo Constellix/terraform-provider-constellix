@@ -49,6 +49,8 @@ github.com/Constellix/constellix-go-client v1.0.4-0.20200817083306-aff91a494d12 
 github.com/Constellix/constellix-go-client v1.0.4-0.20200817083306-aff91a494d12/go.mod h1:zd3j7BeCZvtZ8pfDYwv/JUSKQ72hgRWFYicBgVUnHFo=
 github.com/Constellix/constellix-go-client v1.0.4-0.20200817085426-b9640313e349 h1:HE1eEbgguFx1ye3ww6MPNRfhNWmZ7W2hS70a+6U+c1o=
 github.com/Constellix/constellix-go-client v1.0.4-0.20200817085426-b9640313e349/go.mod h1:zd3j7BeCZvtZ8pfDYwv/JUSKQ72hgRWFYicBgVUnHFo=
+github.com/Constellix/constellix-go-client v1.0.4 h1:CtusAcBod+nsv50dxEE86k3Jxr+HSb+nJvBTcJ6RXeg=
+github.com/Constellix/constellix-go-client v1.0.4/go.mod h1:zd3j7BeCZvtZ8pfDYwv/JUSKQ72hgRWFYicBgVUnHFo=
 github.com/agext/levenshtein v1.2.1/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
 github.com/agext/levenshtein v1.2.2 h1:0S/Yg6LYmFJ5stwQeRp6EeOcCbj7xiqQSdNelsXvaqE=
 github.com/agext/levenshtein v1.2.2/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=

@@ -4,6 +4,7 @@ type GeolocationArecord struct {
 	GeoIpUserRegion []int `json:"geoipUserRegion,omitempty"`
 	Drop            bool  `json:"drop,omitempty"`
 	GeoIpProximity  int   `json:"geoipProximity,omitempty"`
+	GeoIpFailOver   bool  `json:"geoipFailover,omitempty"`
 }
 
 type RoundrobinArecord struct {
