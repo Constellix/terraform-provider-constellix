@@ -57,6 +57,11 @@ func datasourceConstellixCNameRecord() *schema.Resource {
 							Optional: true,
 							Computed: true,
 						},
+						"geo_ip_failover": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
 					},
 				},
 				Optional: true,
@@ -182,6 +187,7 @@ func datasourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) 
 				if geoloc["geoipFilter"] != nil {
 					geoset["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
 					geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+					geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
 				} else {
 					geoset["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
 				}

@@ -73,6 +73,11 @@ func resourceConstellixCNameRecord() *schema.Resource {
 							Optional: true,
 							Computed: true,
 						},
+						"geo_ip_failover": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
 					},
 				},
 				Optional: true,
@@ -193,6 +198,7 @@ func resourceConstellixCNameRecordImport(d *schema.ResourceData, m interface{}) 
 		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
 		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
 		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
 	} else {
 		geoset = nil
 	}
@@ -289,7 +295,7 @@ func resourceConstellixCNameRecordCreate(d *schema.ResourceData, m interface{}) 
 		}
 		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
 		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
-
+		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
 		if geoloc != nil {
 			aAttr.GeoLocation = geoloc
 		} else {
@@ -379,6 +385,7 @@ func resourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) er
 		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
 		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
 		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
 	} else {
 		geoset = nil
 	}
@@ -473,7 +480,7 @@ func resourceConstellixCNameRecordUpdate(d *schema.ResourceData, m interface{}) 
 		}
 		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
 		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
-
+		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
 		if geoloc != nil {
 			aAttr.GeoLocation = geoloc
 		} else {

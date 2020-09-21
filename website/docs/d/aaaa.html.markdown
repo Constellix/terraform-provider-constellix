@@ -37,6 +37,7 @@ data "constellix_aaaa_record" "firstrecord" {
 * `geo_location.geo_ip_proximity` - (Optional) a valid geoipProximity id.
 * `geo_location.geo_ip_user_region` - (Optional) For Geo IP Filter to be applied. geoipUserRegion should be [1].
 * `geo_location.drop` - (Optional) drop flag. Default is false.
+* `geo_location.geo_ip_failover` - (Optional) Flag to enable/disable Failover to nearest proximity when all the host fails. Works with the record type pools. It requires Geo Proximity to be enabled at the Domain level. Default is false. 
 * `geo_location.geo_ip_proximity` - (Optional) for Geo IP Filter, geoipProximity must not be provided. please create an A record with "World (Default)" IP Filter first before a more specific IP Filter is applied. The "World (Default)" record would only be used if no matching Filter or Proximity records are found.
 * `record_option` - (Optional) Type of record. "roundRobin" for Standard record (Default). "failover" for Failover. "pools" for Pools. "roundRobinFailover" for Round Robin with Failover.
 * `noanswer` - (Optional) Shows if record is enabled or disabled. Default is false (Active).
