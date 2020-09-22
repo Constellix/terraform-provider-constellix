@@ -45,6 +45,38 @@ func resourceConstellixANAMERecord() *schema.Resource {
 				Required: true,
 			},
 
+			"geo_location": &schema.Schema{
+				Type: schema.TypeMap,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"geo_ip_user_region": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
+						},
+
+						"drop": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+
+						"geo_ip_proximity": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
+						},
+						"geo_ip_failover": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+					},
+				},
+				Optional: true,
+				Computed: true,
+			},
+
 			"record_option": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -97,7 +129,8 @@ func resourceConstellixANAMERecord() *schema.Resource {
 						},
 					},
 				},
-				Required: true,
+				Optional: true,
+				Computed: true,
 			},
 
 			"record_failover_values": &schema.Schema{
@@ -136,6 +169,12 @@ func resourceConstellixANAMERecord() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"pools": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
 		},
 	}
 }
@@ -161,6 +200,19 @@ func resourceConstellixANAMERecordImport(d *schema.ResourceData, m interface{}) 
 	err = json.Unmarshal([]byte(bodyString), &data)
 	if err != nil {
 		return nil, err
+	}
+
+	geoloc1 := data["geolocation"]
+	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
+	geoset := make(map[string]interface{})
+	if geoloc1 != nil {
+		geoloc := geoloc1.(map[string]interface{})
+		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+	} else {
+		geoset = nil
 	}
 
 	arecroundrobin := data["roundRobin"].([]interface{})
@@ -200,9 +252,11 @@ func resourceConstellixANAMERecordImport(d *schema.ResourceData, m interface{}) 
 	d.Set("ttl", data["ttl"])
 	d.Set("domain_id", params[1])
 	d.Set("source_type", params[0])
+	d.Set("geo_location", geoset)
 	d.Set("record_option", data["recordOption"])
 	d.Set("noanswer", data["noAnswer"])
 	d.Set("note", data["note"])
+	d.Set("pools", data["pools"])
 	d.Set("gtd_region", data["gtdRegion"])
 	d.Set("type", data["type"])
 	d.Set("contact_ids", data["contactids"])
@@ -246,6 +300,9 @@ func resourceConstellixANAMERecordCreate(d *schema.ResourceData, m interface{}) 
 	if types, ok := d.GetOk("type"); ok {
 		anameAttr.Type = types.(string)
 	}
+	if pools, ok := d.GetOk("pools"); ok {
+		anameAttr.Pools = toListOfInt(pools)
+	}
 
 	if contactids, ok := d.GetOk("contact_ids"); ok {
 		contactidList := toStringList(contactids.([]interface{}))
@@ -260,6 +317,26 @@ func resourceConstellixANAMERecordCreate(d *schema.ResourceData, m interface{}) 
 		}
 
 		anameAttr.ContactIDs = intlist
+	}
+
+	var geoloc *models.GeolocationANAME
+	if geoipuserregion, ok := d.GetOk("geo_location"); ok {
+		geoloc = &models.GeolocationANAME{}
+		geouserlist := make([]int, 0)
+		tp := geoipuserregion.(map[string]interface{})
+		var1, _ := strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_user_region"]))
+		if tp["geo_ip_user_region"] != nil {
+			geouserlist = append(geouserlist, var1)
+			geoloc.GeoIpUserRegion = geouserlist
+		}
+		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
+		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
+		geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["geo_ip_failover"]))
+		if geoloc != nil {
+			anameAttr.GeoLocation = geoloc
+		} else {
+			anameAttr.GeoLocation = nil
+		}
 	}
 
 	maplistrr := make([]interface{}, 0, 1)
@@ -350,6 +427,20 @@ func resourceConstellixANAMERecordRead(d *schema.ResourceData, m interface{}) er
 		return err
 	}
 
+	geoloc1 := data["geolocation"]
+	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
+	geoset := make(map[string]interface{})
+	if geoloc1 != nil {
+		geoloc := geoloc1.(map[string]interface{})
+		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		log.Printf("jkkk %v", geoset)
+	} else {
+		geoset = nil
+	}
+
 	arecroundrobin := data["roundRobin"].([]interface{})
 	rrlist := make([]interface{}, 0, 1)
 	for _, valrrf := range arecroundrobin {
@@ -387,6 +478,8 @@ func resourceConstellixANAMERecordRead(d *schema.ResourceData, m interface{}) er
 	d.Set("record_option", data["recordOption"])
 	d.Set("noanswer", data["noAnswer"])
 	d.Set("note", data["note"])
+	d.Set("geo_location", geoset)
+	d.Set("pools", data["pools"])
 	d.Set("gtd_region", data["gtdRegion"])
 	d.Set("type", data["type"])
 	d.Set("contact_ids", data["contactids"])
@@ -431,6 +524,9 @@ func resourceConstellixANAMERecordUpdate(d *schema.ResourceData, m interface{}) 
 	if _, ok := d.GetOk("type"); ok {
 		anameAttr.Type = d.Get("type").(string)
 	}
+	if pools, ok := d.GetOk("pools"); ok {
+		anameAttr.Pools = toListOfInt(pools)
+	}
 
 	if _, ok := d.GetOk("contact_ids"); ok {
 
@@ -445,6 +541,26 @@ func resourceConstellixANAMERecordUpdate(d *schema.ResourceData, m interface{}) 
 			intlist = append(intlist, j)
 		}
 		anameAttr.ContactIDs = intlist
+	}
+
+	var geoloc *models.GeolocationANAME
+	if geoipuserregion, ok := d.GetOk("geo_location"); ok {
+		geoloc = &models.GeolocationANAME{}
+		geouserlist := make([]int, 0)
+		tp := geoipuserregion.(map[string]interface{})
+		var1, _ := strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_user_region"]))
+		if tp["geo_ip_user_region"] != nil {
+			geouserlist = append(geouserlist, var1)
+			geoloc.GeoIpUserRegion = geouserlist
+		}
+		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
+		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
+		geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["geo_ip_failover"]))
+		if geoloc != nil {
+			anameAttr.GeoLocation = geoloc
+		} else {
+			anameAttr.GeoLocation = nil
+		}
 	}
 
 	maplistrr := make([]interface{}, 0, 1)

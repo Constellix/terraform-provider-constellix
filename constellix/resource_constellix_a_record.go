@@ -224,17 +224,15 @@ func resourceConstellixARecordImport(d *schema.ResourceData, m interface{}) ([]*
 		return nil, err
 	}
 
-	geoloc1 := data["geo_location"]
+	geoloc1 := data["geolocation"]
+	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
 	geoset := make(map[string]interface{})
 	if geoloc1 != nil {
 		geoloc := geoloc1.(map[string]interface{})
-		if geoloc["geoipFilter"] != nil {
-			geoset["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
-			geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-			geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-		} else {
-			geoset["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
-		}
+		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
 	} else {
 		geoset = nil
 	}
@@ -466,17 +464,15 @@ func resourceConstellixARecordRead(d *schema.ResourceData, m interface{}) error 
 		return err
 	}
 
-	geoloc1 := data["geo_location"]
+	geoloc1 := data["geolocation"]
+	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
 	geoset := make(map[string]interface{})
 	if geoloc1 != nil {
 		geoloc := geoloc1.(map[string]interface{})
-		if geoloc["geoipFilter"] != nil {
-			geoset["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
-			geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-			geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-		} else {
-			geoset["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
-		}
+		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
 	} else {
 		geoset = nil
 	}

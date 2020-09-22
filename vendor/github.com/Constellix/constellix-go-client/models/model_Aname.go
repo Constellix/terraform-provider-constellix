@@ -3,16 +3,25 @@ package models
 type AnameAttributes struct {
 	//Id              int      `json:"id"`
 	//DomainID       string   `json:"domainid"`
-	Name                string        `json:"name,omitempty"`
-	TTL                 int           `json:"ttl"`
-	RecordOption        string        `json:"recordOption,omitempty"`
-	NoAnswer            bool          `json:"noAnswer,omitempty"`
-	Note                string        `json:"note,omitempty"`
-	GtdRegion           int           `json:"gtdRegion,omitempty"`
-	Type                string        `json:"type,omitempty"`
-	ContactIDs          []int         `json:"contactids,omitempty"`
-	RoundRobin          []interface{} `json:"roundRobin,omitempty"`
-	RecordFailoverAname *RCDFAname    `json:"recordFailover,omitempty"`
+	Name                string            `json:"name,omitempty"`
+	TTL                 int               `json:"ttl"`
+	RecordOption        string            `json:"recordOption,omitempty"`
+	NoAnswer            bool              `json:"noAnswer,omitempty"`
+	Note                string            `json:"note,omitempty"`
+	GtdRegion           int               `json:"gtdRegion,omitempty"`
+	Type                string            `json:"type,omitempty"`
+	ContactIDs          []int             `json:"contactids,omitempty"`
+	RoundRobin          []interface{}     `json:"roundRobin,omitempty"`
+	Pools               []int             `json:"pools,omitempty"`
+	GeoLocation         *GeolocationANAME `json:"geolocation,omitempty"`
+	RecordFailoverAname *RCDFAname        `json:"recordFailover,omitempty"`
+}
+
+type GeolocationANAME struct {
+	GeoIpUserRegion []int `json:"geoipUserRegion,omitempty"`
+	Drop            bool  `json:"drop,omitempty"`
+	GeoIpProximity  int   `json:"geoipProximity,omitempty"`
+	GeoIpFailOver   bool  `json:"geoipFailover,omitempty"`
 }
 
 type AnameRoundRobin struct {
