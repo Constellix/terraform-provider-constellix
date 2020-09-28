@@ -53,7 +53,8 @@ func resourceConstellixCNameRecord() *schema.Resource {
 			},
 
 			"geo_location": &schema.Schema{
-				Type: schema.TypeMap,
+				Type: schema.TypeSet,
+				Required: false,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"geo_ip_user_region": &schema.Schema{
@@ -192,13 +193,15 @@ func resourceConstellixCNameRecordImport(d *schema.ResourceData, m interface{}) 
 
 	geoloc1 := data["geolocation"]
 	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make(map[string]interface{})
+	geoset := make([]interface{}, 0, 1)
 	if geoloc1 != nil {
+		geoMap := make(map[string]interface{})
 		geoloc := geoloc1.(map[string]interface{})
-		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoset = append(geoset, geoMap)
 	} else {
 		geoset = nil
 	}
@@ -379,13 +382,15 @@ func resourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) er
 
 	geoloc1 := data["geolocation"]
 	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make(map[string]interface{})
+	geoset := make([]interface{}, 0, 1)
 	if geoloc1 != nil {
+		geoMap := make(map[string]interface{})
 		geoloc := geoloc1.(map[string]interface{})
-		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoset = append(geoset, geoMap)
 	} else {
 		geoset = nil
 	}
