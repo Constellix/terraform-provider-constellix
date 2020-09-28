@@ -136,9 +136,9 @@ func resourceConstellixCnameRecordPoolImport(d *schema.ResourceData, m interface
 		inner := val.(map[string]interface{})
 		tpMap["value"] = fmt.Sprintf("%v", inner["value"])
 		tpMap["weight"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["weight"]))
-		tpMap["disableFlag"] = fmt.Sprintf("%v", inner["disableFlag"])
+		tpMap["disable_flag"] = fmt.Sprintf("%v", inner["disableFlag"])
 		tpMap["policy"] = fmt.Sprintf("%v", inner["policy"])
-		tpMap["checkId"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["checkId"]))
+		tpMap["check_id"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["checkId"]))
 
 		mapListRR = append(mapListRR, tpMap)
 	}
