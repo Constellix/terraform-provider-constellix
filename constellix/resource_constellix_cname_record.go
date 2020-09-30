@@ -286,25 +286,31 @@ func resourceConstellixCNameRecordCreate(d *schema.ResourceData, m interface{}) 
 		aAttr.Pools = toListOfInt(pools)
 	}
 
-	var geoloc *models.GeolocationCrecord
-	if geoipuserregion, ok := d.GetOk("geo_location"); ok {
-		geoloc = &models.GeolocationCrecord{}
-		geouserlist := make([]int, 0)
-		tp := geoipuserregion.(map[string]interface{})
-		var1, _ := strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_user_region"]))
-		if tp["geo_ip_user_region"] != nil {
-			geouserlist = append(geouserlist, var1)
-			geoloc.GeoIpUserRegion = geouserlist
-		}
-		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
-		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
-		geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["geo_ip_failover"]))
-		if geoloc != nil {
-			aAttr.GeoLocation = geoloc
-		} else {
-			aAttr.GeoLocation = nil
+	var geoloc models.GeolocationCrecord
+	userRegion := make([]int, 0, 1)
+	if v, ok := d.GetOk("geo_location"); ok {
+		vs := v.(*schema.Set).List()
+
+		for _, val := range vs {
+			inner := val.(map[string]interface{})
+
+			if ur, ok := inner["geo_ip_user_region"]; ok {
+				fmt.Println("[DEBUG] User region is ", ur)
+				i, _ := strconv.Atoi(fmt.Sprintf("%v", ur))
+				if i != 0 {
+					userRegion = append(userRegion, i)
+				}
+			}
+
+			geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["drop"]))
+			geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", inner["geo_ip_proximity"]))
+			geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["geo_ip_failover"]))
 		}
 	}
+	if len(userRegion) > 0 {
+		geoloc.GeoIpUserRegion = userRegion
+	}
+	aAttr.GeoLocation = &geoloc
 
 	var valuesrcdf *models.ValuesRCDFCrecord
 	var rcdfa *models.RCDFACRecord //added
@@ -359,9 +365,9 @@ func resourceConstellixCNameRecordCreate(d *schema.ResourceData, m interface{}) 
 
 func resourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) error {
 	constellixClient := m.(*client.Client)
-	arecordid := d.Id()
+	id := d.Id()
 
-	resp, err := constellixClient.GetbyId("v1/" + d.Get("source_type").(string) + "/" + d.Get("domain_id").(string) + "/records/cname/" + arecordid)
+	resp, err := constellixClient.GetbyId("v1/" + d.Get("source_type").(string) + "/" + d.Get("domain_id").(string) + "/records/cname/" + id)
 	if err != nil {
 		if resp.StatusCode == 404 {
 			d.SetId("")
@@ -473,25 +479,32 @@ func resourceConstellixCNameRecordUpdate(d *schema.ResourceData, m interface{}) 
 	if pools, ok := d.GetOk("pools"); ok {
 		aAttr.Pools = toListOfInt(pools)
 	}
-	var geoloc *models.GeolocationCrecord
-	if geoipuserregion, ok := d.GetOk("geo_location"); ok {
-		geoloc = &models.GeolocationCrecord{}
-		geouserlist := make([]int, 0)
-		tp := geoipuserregion.(map[string]interface{})
-		var1, _ := strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_user_region"]))
-		if tp["geo_ip_user_region"] != nil {
-			geouserlist = append(geouserlist, var1)
-			geoloc.GeoIpUserRegion = geouserlist
-		}
-		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
-		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
-		geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["geo_ip_failover"]))
-		if geoloc != nil {
-			aAttr.GeoLocation = geoloc
-		} else {
-			aAttr.GeoLocation = nil
+
+	var geoloc models.GeolocationCrecord
+	userRegion := make([]int, 0, 1)
+	if v, ok := d.GetOk("geo_location"); ok {
+		vs := v.(*schema.Set).List()
+
+		for _, val := range vs {
+			inner := val.(map[string]interface{})
+
+			if ur, ok := inner["geo_ip_user_region"]; ok {
+				fmt.Println("[DEBUG] User region is ", ur)
+				i, _ := strconv.Atoi(fmt.Sprintf("%v", ur))
+				if i != 0 {
+					userRegion = append(userRegion, i)
+				}
+			}
+
+			geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["drop"]))
+			geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", inner["geo_ip_proximity"]))
+			geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["geo_ip_failover"]))
 		}
 	}
+	if len(userRegion) > 0 {
+		geoloc.GeoIpUserRegion = userRegion
+	}
+	aAttr.GeoLocation = &geoloc
 
 	var valuesrcdf *models.ValuesRCDFCrecord
 	var rcdfa *models.RCDFACRecord //added
