@@ -47,7 +47,7 @@ func resourceConstellixARecord() *schema.Resource {
 			},
 
 			"geo_location": &schema.Schema{
-				Type: schema.TypeMap,
+				Type: schema.TypeSet,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 
@@ -226,13 +226,15 @@ func resourceConstellixARecordImport(d *schema.ResourceData, m interface{}) ([]*
 
 	geoloc1 := data["geolocation"]
 	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make(map[string]interface{})
+	geoset := make([]interface{}, 0, 1)
 	if geoloc1 != nil {
+		geoMap := make(map[string]interface{})
 		geoloc := geoloc1.(map[string]interface{})
-		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoset = append(geoset, geoMap)
 	} else {
 		geoset = nil
 	}
@@ -340,26 +342,31 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 		aAttr.Pools = toListOfInt(pools)
 	}
 
-	var geoloc *models.GeolocationArecord
-	if geoipuserregion, ok := d.GetOk("geo_location"); ok {
-		geoloc = &models.GeolocationArecord{}
-		geouserlist := make([]int, 0)
-		tp := geoipuserregion.(map[string]interface{})
-		var1, _ := strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_user_region"]))
-		if tp["geo_ip_user_region"] != nil {
-			geouserlist = append(geouserlist, var1)
-			geoloc.GeoIpUserRegion = geouserlist
-		}
-		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
-		geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["geo_ip_failover"]))
-		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
+	var geoloc models.GeolocationArecord
+	userRegion := make([]int, 0, 1)
+	if v, ok := d.GetOk("geo_location"); ok {
+		vs := v.(*schema.Set).List()
 
-		if geoloc != nil {
-			aAttr.GeoLocation = geoloc
-		} else {
-			aAttr.GeoLocation = nil
+		for _, val := range vs {
+			inner := val.(map[string]interface{})
+
+			if ur, ok := inner["geo_ip_user_region"]; ok {
+				fmt.Println("[DEBUG] User region is ", ur)
+				i, _ := strconv.Atoi(fmt.Sprintf("%v", ur))
+				if i != 0 {
+					userRegion = append(userRegion, i)
+				}
+			}
+
+			geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["drop"]))
+			geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", inner["geo_ip_proximity"]))
+			geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["geo_ip_failover"]))
 		}
 	}
+	if len(userRegion) > 0 {
+		geoloc.GeoIpUserRegion = userRegion
+	}
+	aAttr.GeoLocation = &geoloc
 
 	maplistrr := make([]interface{}, 0, 1)
 	if val, ok := d.GetOk("roundrobin"); ok {
@@ -466,13 +473,15 @@ func resourceConstellixARecordRead(d *schema.ResourceData, m interface{}) error 
 
 	geoloc1 := data["geolocation"]
 	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make(map[string]interface{})
+	geoset := make([]interface{}, 0, 1)
 	if geoloc1 != nil {
+		geoMap := make(map[string]interface{})
 		geoloc := geoloc1.(map[string]interface{})
-		geoset["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoset["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
+		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
+		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+		geoset = append(geoset, geoMap)
 	} else {
 		geoset = nil
 	}
@@ -577,26 +586,32 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 	if pools, ok := d.GetOk("pools"); ok {
 		aAttr.Pools = toListOfInt(pools)
 	}
-	var geoloc *models.GeolocationArecord
-	if geoipuserregion, ok := d.GetOk("geo_location"); ok {
-		geoloc = &models.GeolocationArecord{}
-		geouserlist := make([]int, 0)
-		tp := geoipuserregion.(map[string]interface{})
-		var1, _ := strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_user_region"]))
-		if tp["geo_ip_user_region"] != nil {
-			geouserlist = append(geouserlist, var1)
-			geoloc.GeoIpUserRegion = geouserlist
-		}
-		geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["drop"]))
-		geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", tp["geo_ip_failover"]))
-		geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", tp["geo_ip_proximity"]))
 
-		if geoloc != nil {
-			aAttr.GeoLocation = geoloc
-		} else {
-			aAttr.GeoLocation = nil
+	var geoloc models.GeolocationArecord
+	userRegion := make([]int, 0, 1)
+	if v, ok := d.GetOk("geo_location"); ok {
+		vs := v.(*schema.Set).List()
+
+		for _, val := range vs {
+			inner := val.(map[string]interface{})
+
+			if ur, ok := inner["geo_ip_user_region"]; ok {
+				fmt.Println("[DEBUG] User region is ", ur)
+				i, _ := strconv.Atoi(fmt.Sprintf("%v", ur))
+				if i != 0 {
+					userRegion = append(userRegion, i)
+				}
+			}
+
+			geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["drop"]))
+			geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", inner["geo_ip_proximity"]))
+			geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", inner["geo_ip_failover"]))
 		}
 	}
+	if len(userRegion) > 0 {
+		geoloc.GeoIpUserRegion = userRegion
+	}
+	aAttr.GeoLocation = &geoloc
 
 	maplistrr := make([]interface{}, 0, 1)
 	if val, ok := d.GetOk("roundrobin"); ok {
