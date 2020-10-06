@@ -500,8 +500,6 @@ func buildCGeoPayload(d *schema.ResourceData) *models.GeolocationCrecord {
 			geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", vs))
 		}
 	}
-	if len(userRegion) > 0 {
-		geoloc.GeoIpUserRegion = userRegion
-	}
+	geoloc.GeoIpUserRegion = userRegion
 	return &geoloc
 }
