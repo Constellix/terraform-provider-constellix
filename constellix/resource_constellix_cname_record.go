@@ -471,10 +471,18 @@ func parseCGeoResponse(g map[string]interface{}) map[string]string {
 	log.Println("GEOLOC VALUE: ", g)
 	geo := make(map[string]string)
 	if g != nil {
-		geo["geo_ip_user_region"] =  toString(g["geoipFilter"])
-		geo["drop"] = toString(g["drop"])
-		geo["geo_ip_proximity"] = toString(g["geoipProximity"])
-		geo["geo_ip_failover"] = toString(g["geoipFailover"])
+		if v, ok := g["geoipFilter"]; ok {
+			geo["geo_ip_user_region"] = toString(v)
+		}
+		if v, ok := g["drop"]; ok {
+			geo["drop"] = toString(v)
+		}
+		if v, ok := g["geoipProximity"]; ok {
+			geo["geo_ip_proximity"] = toString(v)
+		}
+		if v, ok := g["geoipFailover"]; ok {
+			geo["geo_ip_failover"] = toString(v)
+		}
 	}
 	return geo
 }
