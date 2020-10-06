@@ -83,8 +83,6 @@ func testAccCheckConstellixCNameConfig_basic(ttl int) string {
 	  geo_location = {
 		geo_ip_failover  = "true"
 		drop             = "false"
-		geo_ip_proximity = ""
-		geo_ip_user_region = ""
 	  }
 		record_option = "failover"
 	    record_failover_values  {

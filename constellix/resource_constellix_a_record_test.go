@@ -83,8 +83,6 @@ func testAccCheckConstellixARecordConfig_basic(ttl int) string {
 	  geo_location = {
 		geo_ip_failover  = "true"
 		drop             = "false"
-		geo_ip_proximity = ""
-		geo_ip_user_region = ""
 	  }
 
 		roundrobin  {
