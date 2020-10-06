@@ -81,8 +81,8 @@ func testAccCheckConstellixARecordConfig_basic(ttl int) string {
 		note = "Practice record"
 
 	  geo_location = {
-		geo_ip_failover  = true
-		drop             = false
+		geo_ip_failover  = "true"
+		drop             = "false"
 	  }
 
 		roundrobin  {

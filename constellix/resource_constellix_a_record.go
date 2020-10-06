@@ -202,20 +202,7 @@ func resourceConstellixARecordImport(d *schema.ResourceData, m interface{}) ([]*
 		return nil, err
 	}
 
-	geoloc1 := data["geolocation"]
-	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make([]interface{}, 0, 1)
-	if geoloc1 != nil {
-		geoMap := make(map[string]interface{})
-		geoloc := geoloc1.(map[string]interface{})
-		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-		geoset = append(geoset, geoMap)
-	} else {
-		geoset = nil
-	}
+	geoset := parseAGeoResponse(data["geolocation"].(map[string]interface{}))
 
 	arecroundrobin := data["roundRobin"].([]interface{})
 	rrlist := make([]interface{}, 0, 1)
@@ -320,7 +307,7 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 		aAttr.Pools = toListOfInt(pools)
 	}
 
-	aAttr.GeoLocation = parseAGeo(d)
+	aAttr.GeoLocation = buildAGeoPayload(d)
 
 	maplistrr := make([]interface{}, 0, 1)
 	if val, ok := d.GetOk("roundrobin"); ok {
@@ -425,20 +412,7 @@ func resourceConstellixARecordRead(d *schema.ResourceData, m interface{}) error 
 		return err
 	}
 
-	geoloc1 := data["geolocation"]
-	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make([]interface{}, 0, 1)
-	if geoloc1 != nil {
-		geoMap := make(map[string]interface{})
-		geoloc := geoloc1.(map[string]interface{})
-		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-		geoset = append(geoset, geoMap)
-	} else {
-		geoset = nil
-	}
+	geoset := parseAGeoResponse(data["geolocation"].(map[string]interface{}))
 
 	arecroundrobin := data["roundRobin"].([]interface{})
 	rrlist := make([]interface{}, 0, 1)
@@ -541,7 +515,7 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 		aAttr.Pools = toListOfInt(pools)
 	}
 
-	aAttr.GeoLocation = parseAGeo(d)
+	aAttr.GeoLocation = buildAGeoPayload(d)
 
 	maplistrr := make([]interface{}, 0, 1)
 	if val, ok := d.GetOk("roundrobin"); ok {
@@ -626,7 +600,19 @@ func resourceConstellixARecordDelete(d *schema.ResourceData, m interface{}) erro
 	return err
 }
 
-func parseAGeo(d *schema.ResourceData) *models.GeolocationArecord {
+func parseAGeoResponse(g map[string]interface{}) map[string]string {
+	log.Println("GEOLOC VALUE: ", g)
+	geo := make(map[string]string)
+	if g != nil {
+		geo["geo_ip_user_region"] =  toString(g["geoipFilter"])
+		geo["drop"] = toString(g["drop"])
+		geo["geo_ip_proximity"] = toString(g["geoipProximity"])
+		geo["geo_ip_failover"] = toString(g["geoipFailover"])
+	}
+	return geo
+}
+
+func buildAGeoPayload(d *schema.ResourceData) *models.GeolocationArecord {
 	var geoloc models.GeolocationArecord
 	userRegion := make([]int, 0, 1)
 	if v, ok := d.GetOk("geo_location"); ok {

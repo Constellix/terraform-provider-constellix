@@ -81,8 +81,8 @@ func testAccCheckConstellixCNameConfig_basic(ttl int) string {
 		note = "Practice record naptr"
 
 	  geo_location = {
-		geo_ip_failover  = true
-		drop             = false
+		geo_ip_failover  = "true"
+		drop             = "false"
 	  }
 		record_option = "failover"
 	    record_failover_values  {

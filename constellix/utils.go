@@ -1,6 +1,7 @@
 package constellix
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -37,4 +38,13 @@ func toListOfInt(configured interface{}) []int {
 		vs = append(vs, value.(int))
 	}
 	return vs
+}
+
+// toString converts a value to its default string representation,
+// and returns an empty string if the value is nil
+func toString(i interface{}) string {
+	if i != nil {
+		return fmt.Sprintf("%v", i)
+	}
+	return ""
 }

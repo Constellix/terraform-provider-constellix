@@ -167,20 +167,7 @@ func resourceConstellixCNameRecordImport(d *schema.ResourceData, m interface{}) 
 		return nil, err
 	}
 
-	geoloc1 := data["geolocation"]
-	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make([]interface{}, 0, 1)
-	if geoloc1 != nil {
-		geoMap := make(map[string]interface{})
-		geoloc := geoloc1.(map[string]interface{})
-		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-		geoset = append(geoset, geoMap)
-	} else {
-		geoset = nil
-	}
+	geoset := parseCGeoResponse(data["geolocation"].(map[string]interface{}))
 
 	rcdf := data["recordFailover"]
 	rcdfset := make(map[string]interface{})
@@ -262,7 +249,7 @@ func resourceConstellixCNameRecordCreate(d *schema.ResourceData, m interface{}) 
 		aAttr.Pools = toListOfInt(pools)
 	}
 
-	aAttr.GeoLocation = parseCGeo(d)
+	aAttr.GeoLocation = buildCGeoPayload(d)
 
 	var valuesrcdf *models.ValuesRCDFCrecord
 	var rcdfa *models.RCDFACRecord //added
@@ -338,20 +325,7 @@ func resourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) er
 		return err
 	}
 
-	geoloc1 := data["geolocation"]
-	log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
-	geoset := make([]interface{}, 0, 1)
-	if geoloc1 != nil {
-		geoMap := make(map[string]interface{})
-		geoloc := geoloc1.(map[string]interface{})
-		geoMap["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipFilter"]))
-		geoMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-		geoMap["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", geoloc["geoipProximity"]))
-		geoMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-		geoset = append(geoset, geoMap)
-	} else {
-		geoset = nil
-	}
+	geoset := parseCGeoResponse(data["geolocation"].(map[string]interface{}))
 
 	rcdf := data["recordFailover"]
 	rcdfset := make(map[string]interface{})
@@ -432,7 +406,7 @@ func resourceConstellixCNameRecordUpdate(d *schema.ResourceData, m interface{}) 
 		aAttr.Pools = toListOfInt(pools)
 	}
 
-	aAttr.GeoLocation = parseCGeo(d)
+	aAttr.GeoLocation = buildCGeoPayload(d)
 
 	var valuesrcdf *models.ValuesRCDFCrecord
 	var rcdfa *models.RCDFACRecord //added
@@ -490,7 +464,22 @@ func resourceConstellixCNameRecordDelete(d *schema.ResourceData, m interface{}) 
 	return err
 }
 
-func parseCGeo(d *schema.ResourceData) *models.GeolocationCrecord {
+// parseCGeoResponse reads the description of a geolocation returned
+// by the API as part of a CNAME record resource, and returns
+// a map with string values that conforms to the schema
+func parseCGeoResponse(g map[string]interface{}) map[string]string {
+	log.Println("GEOLOC VALUE: ", g)
+	geo := make(map[string]string)
+	if g != nil {
+		geo["geo_ip_user_region"] =  toString(g["geoipFilter"])
+		geo["drop"] = toString(g["drop"])
+		geo["geo_ip_proximity"] = toString(g["geoipProximity"])
+		geo["geo_ip_failover"] = toString(g["geoipFailover"])
+	}
+	return geo
+}
+
+func buildCGeoPayload(d *schema.ResourceData) *models.GeolocationCrecord {
 	var geoloc models.GeolocationCrecord
 	userRegion := make([]int, 0, 1)
 	if v, ok := d.GetOk("geo_location"); ok {
