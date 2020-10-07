@@ -53,14 +53,35 @@ func resourceConstellixCNameRecord() *schema.Resource {
 			},
 
 			"geo_location": &schema.Schema{
-				Type: schema.TypeMap,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
+				Type:     schema.TypeSet,
 				Optional: true,
-				Computed: true,
-			},
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"geo_ip_user_region": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
+						},
 
+						"drop": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+
+						"geo_ip_proximity": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
+						},
+						"geo_ip_failover": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"record_option": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -467,22 +488,24 @@ func resourceConstellixCNameRecordDelete(d *schema.ResourceData, m interface{}) 
 // parseCGeoResponse reads the description of a geolocation returned
 // by the API as part of a CNAME record resource, and returns
 // a map with string values that conforms to the schema
-func parseCGeoResponse(g map[string]interface{}) map[string]string {
+func parseCGeoResponse(g map[string]interface{}) []interface{} {
 	log.Println("GEOLOC VALUE: ", g)
-	geo := make(map[string]string)
+	geo := make([]interface{}, 0, 1)
 	if g != nil {
+		m := make(map[string]interface{})
 		if v, ok := g["geoipFilter"]; ok {
-			geo["geo_ip_user_region"] = toString(v)
+			m["geo_ip_user_region"], _ = strconv.Atoi(fmt.Sprintf("%v", v))
 		}
 		if v, ok := g["drop"]; ok {
-			geo["drop"] = toString(v)
+			m["drop"] = fmt.Sprintf("%v", v)
 		}
 		if v, ok := g["geoipProximity"]; ok {
-			geo["geo_ip_proximity"] = toString(v)
+			m["geo_ip_proximity"], _ = strconv.Atoi(fmt.Sprintf("%v", v))
 		}
 		if v, ok := g["geoipFailover"]; ok {
-			geo["geo_ip_failover"] = toString(v)
+			m["geo_ip_failover"] = fmt.Sprintf("%v", v)
 		}
+		geo = append(geo, m)
 	}
 	return geo
 }
@@ -491,21 +514,26 @@ func buildCGeoPayload(d *schema.ResourceData) *models.GeolocationCrecord {
 	var geoloc models.GeolocationCrecord
 	userRegion := make([]int, 0, 1)
 	if v, ok := d.GetOk("geo_location"); ok {
-		inner := v.(map[string]interface{})
-		if vs, ok := inner["geo_ip_user_region"]; ok {
-			i, _ := strconv.Atoi(fmt.Sprintf("%v", vs))
-			if i != 0 {
-				userRegion = append(userRegion, i)
+		vs := v.(*schema.Set).List()
+
+		for _, vs := range vs {
+
+			inner := vs.(map[string]interface{})
+			if val, ok := inner["geo_ip_user_region"]; ok {
+				i, _ := strconv.Atoi(fmt.Sprintf("%v", val))
+				if i != 0 {
+					userRegion = append(userRegion, i)
+				}
 			}
-		}
-		if vs, ok := inner["drop"]; ok {
-			geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", vs))
-		}
-		if vs, ok := inner["geo_ip_proximity"]; ok {
-			geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", vs))
-		}
-		if vs, ok := inner["geo_ip_failover"]; ok {
-			geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", vs))
+			if val, ok := inner["drop"]; ok {
+				geoloc.Drop, _ = strconv.ParseBool(fmt.Sprintf("%v", val))
+			}
+			if val, ok := inner["geo_ip_proximity"]; ok {
+				geoloc.GeoIpProximity, _ = strconv.Atoi(fmt.Sprintf("%v", val))
+			}
+			if val, ok := inner["geo_ip_failover"]; ok {
+				geoloc.GeoIpFailOver, _ = strconv.ParseBool(fmt.Sprintf("%v", val))
+			}
 		}
 	}
 	if len(userRegion) > 0 {
