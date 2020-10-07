@@ -47,13 +47,13 @@ func TestAccConstellixCName_Update(t *testing.T) {
 					testAccCheckConstellixCNameAttributes(1800, &cname),
 				),
 			},
-			//{
-			//	Config: testAccCheckConstellixCNameConfig_basic(1900),
-			//	Check: resource.ComposeTestCheckFunc(
-			//		testAccCheckConstellixCNameExists("constellix_domain.domain1", "constellix_cname_record.cname1", &cname),
-			//		testAccCheckConstellixCNameAttributes("1900", &cname),
-			//	),
-			//},
+			{
+				Config: testAccCheckConstellixCNameConfig_basic(1900),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckConstellixCNameExists("constellix_domain.domain1", "constellix_cname_record.cname1", &cname),
+					testAccCheckConstellixCNameAttributes("1900", &cname),
+				),
+			},
 		},
 	})
 }
