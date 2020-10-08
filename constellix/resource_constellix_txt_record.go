@@ -143,7 +143,7 @@ func resourceConstellixTxtImport(d *schema.ResourceData, m interface{}) ([]*sche
 		tpMap := make(map[string]interface{})
 		inner := val.(map[string]interface{})
 		tpMap["value"] = fmt.Sprintf("%v", inner["value"])
-		tpMap["disableFlag"] = fmt.Sprintf("%v", inner["disableFlag"])
+		tpMap["disable_flag"] = fmt.Sprintf("%v", inner["disableFlag"])
 		mapListRR = append(mapListRR, tpMap)
 	}
 
