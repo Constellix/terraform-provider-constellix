@@ -249,11 +249,11 @@ func (c *Client) DeletebyId(endpoint string) error {
 		return err
 	}
 
-	_, err1 := c.httpclient.Do(req)
+	resp, err1 := c.httpclient.Do(req)
 	if err1 != nil {
 		return err1
 	}
-	return nil
+	return checkForErrors(resp)
 }
 
 func (c *Client) UpdatebyID(obj interface{}, endpoint string) (response *http.Response, err error) {
