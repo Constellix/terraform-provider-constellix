@@ -194,7 +194,7 @@ func checkForErrors(resp *http.Response) error {
 }
 
 func checkForErrorsChecks(resp *http.Response) error {
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != 201 {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != 201 && resp.StatusCode != 202 {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Fatal(err)
@@ -249,11 +249,15 @@ func (c *Client) DeletebyId(endpoint string) error {
 		return err
 	}
 
-	_, err1 := c.httpclient.Do(req)
+	log.Println("request for delete : ", req)
+
+	resp, err1 := c.httpclient.Do(req)
 	if err1 != nil {
+		log.Println("Response from server for delete : ", resp)
 		return err1
 	}
-	return nil
+	log.Println("Response from server for delete : ", resp)
+	return checkForErrorsChecks(resp)
 }
 
 func (c *Client) UpdatebyID(obj interface{}, endpoint string) (response *http.Response, err error) {
