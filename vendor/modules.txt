@@ -6,7 +6,7 @@ cloud.google.com/go/internal/optional
 cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 cloud.google.com/go/storage
-# github.com/Constellix/constellix-go-client v1.0.6
+# github.com/Constellix/constellix-go-client v1.0.10
 github.com/Constellix/constellix-go-client/client
 github.com/Constellix/constellix-go-client/models
 # github.com/agext/levenshtein v1.2.2
