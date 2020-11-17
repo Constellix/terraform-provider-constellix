@@ -17,7 +17,7 @@ resource "constellix_cname_record_pool" "firstrecord" {
   num_return             = "10"
   min_available_failover = 1
   values {
-    value        = "8.1.1.1"
+    value        = "www.example.com"
     weight       = 20
     policy       = "followsonar"
     disable_flag = false
