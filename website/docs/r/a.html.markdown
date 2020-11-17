@@ -81,17 +81,17 @@ resource "constellix_a_record" "firstrecord" {
 * `contact_ids` - (Optional) Applied contact list id. Only applicable to record with type roundRobin with failover and failover.
 * `pools` - (Optional) Ids of Apool.
 * `roundrobin_failover` - (Optional) Set.
-* `roundrobin_failover.value` - (Required) IPv4 address.
-* `roundrobin_failover.disable_flag` - (Required) enable or disable the recordFailover value object. Default is false (Active). Atleast one recordFailover value object should be false.
-* `roundrobin_failover.sort_order` - (Required) Integer value which decides in which order the rounrobinfailover should be sorted.
+* `roundrobin_failover.value` - (Required for failover) IPv4 address.
+* `roundrobin_failover.disable_flag` - (Required for failover) enable or disable the recordFailover value object. Default is false (Active). Atleast one recordFailover value object should be false.
+* `roundrobin_failover.sort_order` - (Requiredfor failover) Integer value which decides in which order the rounrobinfailover should be sorted.
 * `record_failover` - (Optional) To create a record failover object pass the following attributes.
-* `record_failover_values` - (Required) Set. 
-* `record_failover_values.value` - (Required) IPv4 address.
+* `record_failover_values` - (Required for failover) Set. 
+* `record_failover_values.value` - (Required for failover) IPv4 address.
 * `record_failover_values.check_id` - (Optional) Sonar check id.
-* `record_failover_values.sort_order` - (Required) Integer value which decides in which order the recordfailover should be sorted.
-* `record_failover_values.disable_flag` - (Required) enable or disable the recordFailover value object. Default is false (Active). Atleast one recordFailover value object should be false.
-* `record_failover_failover_type` - (Required) 1 for Normal (always lowest level). 2 for Off on any Failover event. 3 for One Way (move to higher level).
-* `record_failover_disable_flag` - (Required) enable or disable the recordFailover object. Default is false (Active). Atleast one recordFailover object should be false.
+* `record_failover_values.sort_order` - (Required for failover) Integer value which decides in which order the recordfailover should be sorted.
+* `record_failover_values.disable_flag` - (Required for failover) enable or disable the recordFailover value object. Default is false (Active). Atleast one recordFailover value object should be false.
+* `record_failover_failover_type` - (Required for failover) 1 for Normal (always lowest level). 2 for Off on any Failover event. 3 for One Way (move to higher level).
+* `record_failover_disable_flag` - (Required for failover) enable or disable the recordFailover object. Default is false (Active). Atleast one recordFailover object should be false.
 
 ## Attributes Reference
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the A resource.
