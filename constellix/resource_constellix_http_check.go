@@ -35,6 +35,7 @@ func resourceConstellixHTTPCheck() *schema.Resource {
 			"host": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 
 			"ip_version": &schema.Schema{
