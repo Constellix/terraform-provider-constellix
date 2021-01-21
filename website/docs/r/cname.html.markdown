@@ -17,7 +17,7 @@ resource "constellix_cname_record" "firstrecord" {
   source_type   = "domains"
   record_option = "failover"
   ttl           = 100
-  name          = "arecordname350"
+  name          = "cnamerecord"
   host          = "abcd.com."
   geo_location = {
     geo_ip_user_region = 1
@@ -50,6 +50,7 @@ resource "constellix_cname_record" "firstrecord" {
 * `source_type` - (Required) Type of the CName record. The values which can be applied are "domains" or "templates".
 * `ttl` - (Required) TTL must be in between 0 and 2147483647.
 * `name` - (Optional) Name of record. Name should be unique.
+* `host` - (Required for standard CNAME) Value/"alias to" of the CNAME record.
 * `geo_location` - (Optional) Details of IP filter / Geo proximity to be applied. Default is null.
 * `geo_location.geo_ip_user_region` - (Optional) For Geo proximity to be applied. geoipUserRegion should not be provided.
 * `geo_location.drop` - (Optional) drop flag. Default is false.
@@ -66,13 +67,13 @@ resource "constellix_cname_record" "firstrecord" {
 * `contact_ids` - (Optional) Applied contact list id. Only applicable to record with type roundRobin with failover and failover.
 * `pools` - (Optional) Ids of CNamepool.
 * `record_failover` - (Optional) To create a record failover object pass the following attributes.
-* `record_failover_values` - (Required) Set. 
-* `record_failover_values.value` - (Required) Host name.
+* `record_failover_values` - (Required for failover) Set. 
+* `record_failover_values.value` - (Required for failover) Host name.
 * `record_failover_values.check_id` - (Optional) Sonar check id.
-* `record_failover_values.sort_order` - (Required) Integer value which decides in which order the recordfailover should be sorted.
-* `record_failover_values.disable_flag` - (Required) enable or disable the recordFailover value object. Default is false (Active). Atleast one recordFailover value object should be false.
-* `record_failover_failover_type` - (Required) 1 for Normal (always lowest level). 2 for Off on any Failover event. 3 for One Way (move to higher level).
-* `record_failover_disable_flag` - (Required) enable or disable the recordFailover object. Default is false (Active). Atleast one recordFailover object should be false.
+* `record_failover_values.sort_order` - (Required for failover) Integer value which decides in which order the recordfailover should be sorted.
+* `record_failover_values.disable_flag` - (Required for failover) enable or disable the recordFailover value object. Default is false (Active). Atleast one recordFailover value object should be false.
+* `record_failover_failover_type` - (Required for failover) 1 for Normal (always lowest level). 2 for Off on any Failover event. 3 for One Way (move to higher level).
+* `record_failover_disable_flag` - (Required for failover) enable or disable the recordFailover object. Default is false (Active). Atleast one recordFailover object should be false.
 
 ## Attributes Reference
 The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the CName resource.
