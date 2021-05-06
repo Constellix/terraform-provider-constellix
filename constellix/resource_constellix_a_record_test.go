@@ -79,6 +79,12 @@ func testAccCheckConstellixARecordConfig_basic(ttl int) string {
 		name = "temparecord"
 		ttl = "%d"
 		note = "Practice record"
+
+	  geo_location {
+		geo_ip_failover  = false
+		drop             = false
+	  }
+
 		roundrobin  {
 			     value       = "16.45.25.35"
 			     disable_flag = "false"
