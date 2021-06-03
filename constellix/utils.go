@@ -2,6 +2,7 @@ package constellix
 
 import (
 	"log"
+	"strings"
 )
 
 func toStringList(configured interface{}) []string {
@@ -37,4 +38,11 @@ func toListOfInt(configured interface{}) []int {
 		vs = append(vs, value.(int))
 	}
 	return vs
+}
+
+func stripQuotes(word string) string {
+	if strings.HasPrefix(word, "\"") && strings.HasSuffix(word, "\"") {
+		return strings.TrimSuffix(strings.TrimPrefix(word, "\""), "\"")
+	}
+	return word
 }
