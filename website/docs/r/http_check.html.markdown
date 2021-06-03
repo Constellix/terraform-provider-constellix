@@ -11,7 +11,7 @@ Manages one or more HTTP check resource.
 # Example Usage #
 ```hcl
         
-resource "constellix_http_check_record" "first" {
+resource "constellix_http_check" "first" {
   name = "http check"
   host = "constellix.com"
   ip_version = "IPV4"
