@@ -1,11 +1,12 @@
 package constellix
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 
 	"github.com/Constellix/constellix-go-client/client"
+	"github.com/Jeffail/gabs"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -30,6 +31,12 @@ func datasourceConstellixDomain() *schema.Resource {
 
 			"has_geoip": &schema.Schema{
 				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+
+			"vanity_nameserver": &schema.Schema{
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
@@ -71,36 +78,36 @@ func datasourceConstellixDomain() *schema.Resource {
 						},
 
 						"ttl": &schema.Schema{
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
 						"refresh": &schema.Schema{
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 						"serial": &schema.Schema{
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
 						"retry": &schema.Schema{
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
 						"expire": &schema.Schema{
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
 
 						"negcache": &schema.Schema{
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Optional: true,
 							Computed: true,
 						},
@@ -124,40 +131,54 @@ func datasourceConstellixDomainRead(d *schema.ResourceData, m interface{}) error
 	if err != nil {
 		return err
 	}
-	bodyString := string(bodyBytes)
 
-	var data []interface{}
-	json.Unmarshal([]byte(bodyString), &data)
+	obj, err := gabs.ParseJSON(bodyBytes)
+	if err != nil {
+		return err
+	}
 
-	var tp map[string]interface{}
-	var flag bool
-	for _, data := range data {
-		tp = data.(map[string]interface{})
-		if name == tp["name"].(string) {
+	flag := false
+	for i := 0; i < len(obj.Data().([]interface{})); i++ {
+		if stripQuotes(obj.Index(i).S("name").String()) == name {
 			flag = true
-			recsoa := tp["soa"].(map[string]interface{})
 
-			soaSet := make(map[string]interface{})
-			soaSet["primary_nameserver"] = recsoa["primaryNameserver"]
-			soaSet["ttl"] = fmt.Sprintf("%v", recsoa["ttl"])
-			soaSet["email"] = recsoa["email"]
-			soaSet["refresh"] = fmt.Sprintf("%v", recsoa["refresh"])
-			soaSet["expire"] = fmt.Sprintf("%v", recsoa["expire"])
-			soaSet["retry"] = fmt.Sprintf("%v", recsoa["retry"])
-			soaSet["negcache"] = fmt.Sprintf("%v", recsoa["negCache"])
+			soaset := make(map[string]interface{})
+			soaset["primary_nameserver"] = stripQuotes(obj.Index(i).S("soa", "primaryNameserver").String())
+			soaset["ttl"] = stripQuotes(obj.Index(i).S("soa", "ttl").String())
+			if value, ok := d.GetOk("soa"); ok {
+				tp := value.(map[string]interface{})
+				if tp["email"] != nil {
+					soaset["email"] = stripQuotes(obj.Index(i).S("soa", "email").String())
+				}
+			}
+			soaset["refresh"] = stripQuotes(obj.Index(i).S("soa", "refresh").String())
+			soaset["expire"] = stripQuotes(obj.Index(i).S("soa", "expire").String())
+			soaset["retry"] = stripQuotes(obj.Index(i).S("soa", "retry").String())
+			soaset["negcache"] = stripQuotes(obj.Index(i).S("soa", "negCache").String())
 
-			d.SetId(fmt.Sprintf("%v", tp["id"]))
-			d.Set("name", tp["name"])
-			d.Set("soa", soaSet)
-			d.Set("typeid", tp["typeId"])
-			d.Set("has_geoip", tp["hasGeoIP"])
-			d.Set("has_gtd_regions", tp["hasGtdRegions"])
-			d.Set("nameserver_group", tp["nameserverGroup"])
-			d.Set("nameservers", tp["nameservers"])
-			d.Set("note", tp["note"])
-			d.Set("version", tp["version"])
-			d.Set("status", tp["status"])
-			d.Set("tags", tp["tags"])
+			d.Set("id", stripQuotes(obj.Index(i).S("id").String()))
+			d.SetId(stripQuotes(obj.Index(i).S("id").String()))
+			d.Set("name", stripQuotes(obj.Index(i).S("name").String()))
+			d.Set("soa", soaset)
+			if hasGeoIP, err := strconv.ParseBool(stripQuotes(obj.Index(i).S("hasGeoIP").String())); err == nil {
+				d.Set("has_geoip", hasGeoIP)
+			}
+			if hasGTDRegion, err := strconv.ParseBool(stripQuotes(obj.Index(i).S("hasGtdRegions").String())); err == nil {
+				d.Set("has_gtd_regions", hasGTDRegion)
+			}
+			if obj.Index(i).Exists("vanityNameServer") {
+				d.Set("vanity_nameserver", stripQuotes(obj.Index(i).S("vanityNameServer").String()))
+			}
+			if obj.Index(i).Exists("nameserverGroup") {
+				d.Set("nameserver_group", stripQuotes(obj.Index(i).S("nameserverGroup").String()))
+			}
+			d.Set("note", stripQuotes(obj.Index(i).S("note").String()))
+
+			if obj.Index(i).S("tags").Data() != nil {
+				d.Set("tags", toListOfString(obj.Index(i).S("tags").Data()))
+			} else {
+				d.Set("tags", make([]string, 0, 1))
+			}
 		}
 	}
 

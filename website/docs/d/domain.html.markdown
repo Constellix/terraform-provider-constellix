@@ -18,12 +18,14 @@ data "constellix_domain" "domain1" {
  
 ```
 ## Argument Reference ##
-This data source don't have any arguments.
+
+* `name` - (Required) Name of the domain.
 
 ## Attribute Reference
-* `name` - (Required) Name of the domain.
+
 * `has_gtd_regions` - (Optional) GTD Region status of the domain. The Default value is false.
 * `has_geoip` - (Optional) GTD Region status of the domain. The Default value is false.
+* `vanity_nameserver` - (Optional) vanity nameserver of domain.
 * `nameserver_group` - (Optional) Shows the nameserver group of domain. The Default nameserverGroup is 1.
 * `note` - (Optional) Notes while creating the domain. The maximum length will be 1000 characters.
 * `tags` - (Optional) Id of tags applied on domain. The default value is empty.

@@ -37,7 +37,7 @@ type ARecordAttributes struct {
 	TTL                 int                 `json:"ttl"`
 	GeoLocation         *GeolocationArecord `json:"geolocation,omitempty"`
 	RecordOption        string              `json:"recordOption,omitempty"`
-	NoAnswer            bool                `json:"noAnswer,omitempty"`
+	NoAnswer            bool                `json:"noAnswer,"`
 	Note                string              `json:"note,omitempty"`
 	GtdRegion           int                 `json:"gtdRegion,omitempty"`
 	Type                string              `json:"type,omitempty"`
