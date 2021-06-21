@@ -181,7 +181,7 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	}
 	d.Set("note", stripQuotes(obj.S("note").String()))
 
-	if stripQuotes(obj.S("tags").String()) != "null" {
+	if obj.S("tags").Data() != nil {
 		d.Set("tags", toListOfString(obj.S("tags").Data()))
 	} else {
 		d.Set("tags", make([]string, 0, 1))
