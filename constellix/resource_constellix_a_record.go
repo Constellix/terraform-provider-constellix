@@ -272,12 +272,11 @@ func resourceConstellixARecordImport(d *schema.ResourceData, m interface{}) ([]*
 	}
 
 	rcdf := data["recordFailover"]
-	rcdfset := make(map[string]interface{})
 	rcdflist := make([]interface{}, 0, 1)
 	if rcdf != nil {
 		rcdf1 := rcdf.(map[string]interface{})
-		rcdfset["record_failover_failover_type"] = fmt.Sprintf("%v", rcdf1["failoverType"])
-		rcdfset["record_failover_disable_flag"] = fmt.Sprintf("%v", rcdf1["disabled"])
+		d.Set("record_failover_failover_type", fmt.Sprintf("%v", rcdf1["failoverType"]))
+		d.Set("record_failover_disable_flag", fmt.Sprintf("%v", rcdf1["disabled"]))
 
 		rcdfvalues := rcdf1["values"].([]interface{})
 
@@ -307,8 +306,7 @@ func resourceConstellixARecordImport(d *schema.ResourceData, m interface{}) ([]*
 	d.Set("roundrobin", rrlist)
 	d.Set("roundrobin_failover", rrflist)
 	d.Set("record_failover_values", rcdflist)
-	d.Set("record_failover_failover_type", rcdfset["record_failover_failover_type"])
-	d.Set("record_failover_disable_flag", rcdfset["record_failover_disable_flag"])
+
 	log.Printf("[DEBUG] %s finished import", d.Id())
 	return []*schema.ResourceData{d}, nil
 
@@ -397,10 +395,9 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 		aAttr.RoundRobinFailoverA = maplist
 	}
 
-	rcdfa := &models.RCDFAARecord{} //added
-	valuesrcdf := &models.ValuesRCDFArecord{}
 	valueslist := make([]interface{}, 0, 1)
 	if value, ok := d.GetOk("record_failover_values"); ok {
+		rcdfa := &models.RCDFAARecord{} //added
 		tp := value.(*schema.Set).List()
 		for _, val := range tp {
 			map1 := make(map[string]interface{})
@@ -412,22 +409,19 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 			valueslist = append(valueslist, map1)
 		}
 		rcdfa.Values = valueslist
-	}
 
-	if failovertype, ok := d.GetOk("record_failover_failover_type"); ok {
-		rcdfa.FailoverTypeRCDFA, _ = strconv.Atoi(fmt.Sprintf("%v", failovertype)) //added
-	}
+		if failovertype, ok := d.GetOk("record_failover_failover_type"); ok {
+			rcdfa.FailoverTypeRCDFA, _ = strconv.Atoi(fmt.Sprintf("%v", failovertype)) //added
+		}
 
-	if disableflag, ok := d.GetOk("record_failover_disable_flag"); ok {
-		rcdfa.DisableFlagRCDFA, _ = strconv.ParseBool(fmt.Sprintf("%v", disableflag)) //added
-	}
+		if disableflag, ok := d.GetOk("record_failover_disable_flag"); ok {
+			rcdfa.DisableFlagRCDFA, _ = strconv.ParseBool(fmt.Sprintf("%v", disableflag)) //added
+		}
 
-	if valuesrcdf != nil {
 		rcdfa.Values = valueslist     //added
 		aAttr.RecordFailoverA = rcdfa //added
-	} else {
-		aAttr.RecordFailoverA = nil
 	}
+
 	resp, err := constellixConnect.Save(aAttr, "v1/"+d.Get("source_type").(string)+"/"+d.Get("domain_id").(string)+"/records/a")
 
 	if err != nil {
@@ -518,12 +512,11 @@ func resourceConstellixARecordRead(d *schema.ResourceData, m interface{}) error 
 	}
 
 	rcdf := data["recordFailover"]
-	rcdfset := make(map[string]interface{})
 	rcdflist := make([]interface{}, 0, 1)
 	if rcdf != nil {
 		rcdf1 := rcdf.(map[string]interface{})
-		rcdfset["record_failover_failover_type"] = fmt.Sprintf("%v", rcdf1["failoverType"])
-		rcdfset["record_failover_disable_flag"] = fmt.Sprintf("%v", rcdf1["disabled"])
+		d.Set("record_failover_failover_type", fmt.Sprintf("%v", rcdf1["failoverType"]))
+		d.Set("record_failover_disable_flag", fmt.Sprintf("%v", rcdf1["disabled"]))
 
 		rcdfvalues := rcdf1["values"].([]interface{})
 
@@ -551,8 +544,7 @@ func resourceConstellixARecordRead(d *schema.ResourceData, m interface{}) error 
 	d.Set("roundrobin", rrlist)
 	d.Set("roundrobin_failover", rrflist)
 	d.Set("record_failover_values", rcdflist)
-	d.Set("record_failover_failover_type", rcdfset["record_failover_failover_type"])
-	d.Set("record_failover_disable_flag", rcdfset["record_failover_disable_flag"])
+
 	return nil
 }
 
@@ -641,10 +633,9 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 		aAttr.RoundRobinFailoverA = maplist
 	}
 
-	rcdfa := &models.RCDFAARecord{} //added
-	valuesrcdf := &models.ValuesRCDFArecord{}
 	valueslist := make([]interface{}, 0, 1)
 	if value, ok := d.GetOk("record_failover_values"); ok {
+		rcdfa := &models.RCDFAARecord{} //added
 		tp := value.(*schema.Set).List()
 		for _, val := range tp {
 			map1 := make(map[string]interface{})
@@ -656,22 +647,19 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 			valueslist = append(valueslist, map1)
 		}
 		rcdfa.Values = valueslist
-	}
 
-	if failovertype, ok := d.GetOk("record_failover_failover_type"); ok {
-		rcdfa.FailoverTypeRCDFA, _ = strconv.Atoi(fmt.Sprintf("%v", failovertype))
-	}
+		if failovertype, ok := d.GetOk("record_failover_failover_type"); ok {
+			rcdfa.FailoverTypeRCDFA, _ = strconv.Atoi(fmt.Sprintf("%v", failovertype))
+		}
 
-	if disableflag, ok := d.GetOk("record_failover_disable_flag"); ok {
-		rcdfa.DisableFlagRCDFA, _ = strconv.ParseBool(fmt.Sprintf("%v", disableflag))
-	}
+		if disableflag, ok := d.GetOk("record_failover_disable_flag"); ok {
+			rcdfa.DisableFlagRCDFA, _ = strconv.ParseBool(fmt.Sprintf("%v", disableflag))
+		}
 
-	if valuesrcdf != nil {
 		rcdfa.Values = valueslist
 		aAttr.RecordFailoverA = rcdfa
-	} else {
-		aAttr.RecordFailoverA = nil
 	}
+
 	arecordid := d.Id()
 
 	_, err := constellixClient.UpdatebyID(aAttr, "v1/"+d.Get("source_type").(string)+"/"+d.Get("domain_id").(string)+"/records/a/"+arecordid)

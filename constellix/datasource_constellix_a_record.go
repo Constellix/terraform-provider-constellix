@@ -270,12 +270,11 @@ func datasourceConstellixARecordRead(d *schema.ResourceData, m interface{}) erro
 			}
 
 			rcdf := tp["recordFailover"]
-			rcdfset := make(map[string]interface{})
 			rcdflist := make([]interface{}, 0, 1)
 			if rcdf != nil {
 				rcdf1 := rcdf.(map[string]interface{})
-				rcdfset["record_failover_failover_type"] = fmt.Sprintf("%v", rcdf1["failoverType"])
-				rcdfset["record_failover_disable_flag"] = fmt.Sprintf("%v", rcdf1["disabled"])
+				d.Set("record_failover_failover_type", fmt.Sprintf("%v", rcdf1["failoverType"]))
+				d.Set("record_failover_disable_flag", fmt.Sprintf("%v", rcdf1["disabled"]))
 
 				rcdfvalues := rcdf1["values"].([]interface{})
 
@@ -302,8 +301,6 @@ func datasourceConstellixARecordRead(d *schema.ResourceData, m interface{}) erro
 			d.Set("roundrobin", rrlist)
 			d.Set("roundrobin_failover", rrflist)
 			d.Set("record_failover_values", rcdflist)
-			d.Set("record_failover_failover_type", rcdfset["record_failover_failover_type"])
-			d.Set("record_failover_disable_flag", rcdfset["record_failover_disable_flag"])
 		}
 	}
 
