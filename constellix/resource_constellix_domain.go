@@ -48,7 +48,6 @@ func resourceConstellixDomain() *schema.Resource {
 			"vanity_nameserver": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed: true,
 			},
 
 			"nameserver_group": &schema.Schema{

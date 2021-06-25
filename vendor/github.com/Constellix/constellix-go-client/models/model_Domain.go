@@ -17,7 +17,7 @@ type DomainAttributes struct {
 	HasGtdRegions    bool          `json:"hasGtdRegions,omitempty"`
 	HasGeoIP         bool          `json:"hasGeoIP,omitempty"`
 	NameserverGroup  string        `json:"nameserverGroup,omitempty"`
-	VanityNameServer string        `json:"vanityNameServer,omitempty"`
+	VanityNameServer string        `json:"vanityNameServer"`
 	Nameservers      []string      `json:"nameservers,omitempty"`
 	Note             string        `json:"note,omitempty"`
 	Version          int           `json:"version,omitempty"`
