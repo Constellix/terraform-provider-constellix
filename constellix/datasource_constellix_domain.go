@@ -172,7 +172,9 @@ func datasourceConstellixDomainRead(d *schema.ResourceData, m interface{}) error
 			if obj.Index(i).Exists("nameserverGroup") {
 				d.Set("nameserver_group", stripQuotes(obj.Index(i).S("nameserverGroup").String()))
 			}
-			d.Set("note", stripQuotes(obj.Index(i).S("note").String()))
+			if obj.Index(i).Exists("note") && obj.Index(i).S("note").String() != "{}" {
+				d.Set("note", stripQuotes(obj.Index(i).S("note").String()))
+			}
 
 			if obj.Index(i).S("tags").Data() != nil {
 				d.Set("tags", toListOfString(obj.Index(i).S("tags").Data()))
