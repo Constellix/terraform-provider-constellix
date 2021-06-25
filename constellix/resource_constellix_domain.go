@@ -178,7 +178,9 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	if obj.Exists("nameserverGroup") {
 		d.Set("nameserver_group", stripQuotes(obj.S("nameserverGroup").String()))
 	}
-	d.Set("note", stripQuotes(obj.S("note").String()))
+	if obj.Exists("note") && obj.S("note").String() != "{}" {
+		d.Set("note", stripQuotes(obj.S("note").String()))
+	}
 
 	if obj.S("tags").Data() != nil {
 		d.Set("tags", toListOfString(obj.S("tags").Data()))
@@ -322,7 +324,9 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	if obj.Exists("nameserverGroup") {
 		d.Set("nameserver_group", stripQuotes(obj.S("nameserverGroup").String()))
 	}
-	d.Set("note", stripQuotes(obj.S("note").String()))
+	if obj.Exists("note") && obj.S("note").String() != "{}" {
+		d.Set("note", stripQuotes(obj.S("note").String()))
+	}
 
 	if obj.S("tags").Data() != nil {
 		d.Set("tags", toListOfString(obj.S("tags").Data()))
@@ -354,7 +358,7 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 		domainAttr.Note = d.Get("note").(string)
 	}
 
-	if _, ok := d.GetOk("tags"); ok {
+	if d.HasChange("tags") {
 		tagsList := d.Get("tags").([]interface{})
 		domainAttr.Tags = tagsList
 	}
