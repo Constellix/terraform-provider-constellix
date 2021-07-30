@@ -47,6 +47,7 @@ resource "constellix_cname_record" "firstrecord" {
 ```
 
 ## Argument Reference ##
+* `domain_id` - (Required) Domain ID under which CNAME record should be created.
 * `source_type` - (Required) Type of the CName record. The values which can be applied are "domains" or "templates".
 * `ttl` - (Required) TTL must be in between 0 and 2147483647.
 * `name` - (Optional) Name of record. Name should be unique.

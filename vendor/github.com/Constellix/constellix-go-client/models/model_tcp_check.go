@@ -11,4 +11,5 @@ type TCPCheckAttributes struct {
 	VerificationPolicy string        `json:"verificationPolicy,omitempty"`
 	StringToSend       string        `json:"stringToSend,omitempty"`
 	StringToReceive    string        `json:"stringToReceive,omitempty"`
+	NotificationGroups []int         `json:"notificationGroups,omitempty"`
 }

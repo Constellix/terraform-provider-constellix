@@ -57,6 +57,14 @@ func resourceConstellixHTTPCheck() *schema.Resource {
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+
+			"notification_groups": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
+
 			"interval": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -141,6 +149,7 @@ func resourceConstellixHTTPCheckImport(d *schema.ResourceData, m interface{}) ([
 	d.Set("ip_version", data["ipVersion"])
 	d.Set("port", data["port"])
 	d.Set("check_sites", data["checkSites"])
+	d.Set("notification_groups", data["notificationGroups"])
 	d.Set("interval", data["interval"])
 	d.Set("interval_policy", data["monitorIntervalPolicy"])
 	d.Set("verification_policy", data["verificationPolicy"])
@@ -179,6 +188,10 @@ func resourceConstellixHTTPCheckCreate(d *schema.ResourceData, m interface{}) er
 
 	if checksites, ok := d.GetOk("check_sites"); ok {
 		httpcheckAttr.Checksites = checksites.([]interface{})
+	}
+
+	if notficationGrp, ok := d.GetOk("notification_groups"); ok {
+		httpcheckAttr.NotificationGroups = toListOfInt(notficationGrp)
 	}
 
 	if interval, ok := d.GetOk("interval"); ok {
@@ -248,6 +261,11 @@ func resourceConstellixHTTPCheckUpdate(d *schema.ResourceData, m interface{}) er
 	if checksites, ok := d.GetOk("check_sites"); ok {
 		httpcheckAttr.Checksites = checksites.([]interface{})
 	}
+
+	if notficationGrp, ok := d.GetOk("notification_groups"); ok {
+		httpcheckAttr.NotificationGroups = toListOfInt(notficationGrp)
+	}
+
 	if interval, ok := d.GetOk("interval"); ok {
 		httpcheckAttr.Interval = interval.(string)
 	}
@@ -304,6 +322,7 @@ func resourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) erro
 	d.Set("ip_version", data["ipVersion"])
 	d.Set("port", data["port"])
 	d.Set("check_sites", data["checkSites"])
+	d.Set("notification_groups", data["notificationGroups"])
 	d.Set("interval", data["interval"])
 	d.Set("interval_policy", data["monitorIntervalPolicy"])
 	d.Set("verification_policy", data["verificationPolicy"])

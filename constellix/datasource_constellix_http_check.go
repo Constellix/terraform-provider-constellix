@@ -50,6 +50,14 @@ func datasourceConstellixHTTPCheck() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+
+			"notification_groups": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
+
 			"interval": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -140,6 +148,7 @@ func datasourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) er
 			d.Set("ip_version", tp["ipVersion"])
 			d.Set("port", tp["port"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("notification_groups", tp["notificationGroups"])
 			d.Set("interval", tp["interval"])
 			d.Set("interval_policy", tp["monitorIntervalPolicy"])
 			d.Set("verification_policy", tp["verificationPolicy"])
