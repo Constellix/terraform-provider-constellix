@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -180,19 +181,27 @@ func datasourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) 
 		if tp["name"].(string) == name1 {
 			flag = true
 
-			geoloc1 := tp["geo_location"]
-			geoset := make(map[string]interface{})
+			geoloc1 := tp["geolocation"]
+			log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
+
+			geoLocMap := make(map[string]interface{})
 			if geoloc1 != nil {
 				geoloc := geoloc1.(map[string]interface{})
 				if geoloc["geoipFilter"] != nil {
-					geoset["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
-					geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-					geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-				} else {
-					geoset["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
+					geoLocMap["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
 				}
+				if geoloc["drop"] != nil {
+					geoLocMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+				}
+				if geoloc["geoipFailover"] != nil {
+					geoLocMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+				}
+				if geoloc["geoipProximity"] != nil {
+					geoLocMap["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
+				}
+				d.Set("geo_location", geoLocMap)
 			} else {
-				geoset = nil
+				d.Set("geo_location", geoLocMap)
 			}
 
 			rcdf := tp["recordFailover"]
@@ -219,7 +228,6 @@ func datasourceConstellixCNameRecordRead(d *schema.ResourceData, m interface{}) 
 			d.Set("host", tp["host"])
 			d.Set("name", tp["name"])
 			d.Set("ttl", tp["ttl"])
-			d.Set("geo_location", geoset)
 			d.Set("record_option", tp["recordOption"])
 			d.Set("noanswer", tp["noAnswer"])
 			d.Set("note", tp["note"])

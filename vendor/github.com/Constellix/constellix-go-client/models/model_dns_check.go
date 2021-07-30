@@ -12,4 +12,5 @@ type DNSAttributes struct {
 	IntervalPolicy     string        `json:"monitorIntervalPolicy,omitempty"`
 	VerificationPolicy string        `json:"verificationPolicy,omitempty"`
 	ExpectedResponse   string        `json:"expectedResponse,omitempty"`
+	NotificationGroups []int         `json:"notificationGroups,omitempty"`
 }

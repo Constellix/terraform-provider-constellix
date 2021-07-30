@@ -14,4 +14,5 @@ type HttpcheckAttr struct {
 	PATH               string        `json:"path,omitempty"`
 	SearchString       string        `json:"searchString,omitempty"`
 	ExpectedStatus     int           `json:"expectedStatusCode,omitempty"`
+	NotificationGroups []int         `json:"notificationGroups,omitempty"`
 }
