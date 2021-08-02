@@ -152,7 +152,7 @@ func resourceConstellixHTTPRedirectionImport(d *schema.ResourceData, m interface
 	d.Set("keywords", data["keywords"])
 	d.Set("description", data["description"])
 	d.Set("url", data["url"])
-	d.Set("hardlink_flag", data["hardlinkflag"])
+	d.Set("hardlink_flag", data["hardlinkFlag"])
 	d.Set("redirect_type_id", data["redirectTypeId"])
 	d.Set("domain_id", params[1])
 	d.Set("source_type", params[0])
@@ -342,7 +342,7 @@ func resourceConstellixHTTPRedirectionRead(d *schema.ResourceData, m interface{}
 	d.Set("keywords", data["keywords"])
 	d.Set("description", data["description"])
 	d.Set("url", data["url"])
-	d.Set("hardlink_flag", data["hardlinkflag"])
+	d.Set("hardlink_flag", data["hardlinkFlag"])
 	d.Set("redirect_type_id", data["redirectTypeId"])
 	log.Println("Data  : ", data)
 

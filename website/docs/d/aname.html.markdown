@@ -26,9 +26,13 @@ data "constellix_aname_record" "dataanamerecord" {
 * `domain_id` - (Required) Record id of Aname record
 
 ## Attribute Reference ##
-* `name` - (Required) Name of record. Name should be unique.
-* `source_type` - (Required) "domains" for Domain records and "template" for Template records
+
 * `ttl` - (Optional) TTL must be in between 0 and 2147483647
+* `geo_location` - (Optional) Details of IP filter / Geo proximity to be applied. Default is null.
+* `geo_location.drop` - (Optional) drop flag. Default is false.
+* `geo_location.geo_ip_proximity` - (Optional) a valid geoipProximity id.
+* `geo_location.geo_ip_user_region` - (Optional) For Geo IP Filter to be applied. geoipUserRegion should be [1].
+* `geo_location.geo_ip_failover` - (Optional) Flag to enable/disable Failover to nearest proximity when all the host fails. Works with the record type pools. It requires Geo Proximity to be enabled at the Domain level. Default is false.
 * `roundrobin` - (Optional) Set
 * `roundrobin.value` - (Optional) Host name. If "Host" value does not end in a dot, your domain name will be appended to it.
 * `roundrobin.disable_flag` - (Optional) Enable or Disable the roundrobin object. Default is false. Atleast one roundrobin object should be false.
@@ -39,7 +43,7 @@ data "constellix_aname_record" "dataanamerecord" {
 * `type` - (Optional) Record type ANAME
 * `contact_ids` - (Optional) Applied contact list id. Only applicable to record with type failover.
 * `record_failover` - (Optional) Set
-* `record_failover_values` - (Required) Set
+* `record_failover_values` - (Optional) Set
 * `record_failover_values.value` - (Optional) Host name
 * `record_failover_values.check_id` - (Optional) Sonar check id
 * `record_failover_values.disable_flag` - (Optional) Enable or Disable the recordfailover values object. Default is false. Atleast one object should be false.
