@@ -11,7 +11,7 @@ description: |-
 # Example Usage #
 ```hcl
         
-resource "constellix_http_redirection" "http1" {
+resource "constellix_http_redirection_record" "http1" {
   domain_id        = "${constellix_domain.domain1.id}"
   source_type      = "domains"
   name             = "redirectionrecord"
@@ -33,7 +33,7 @@ resource "constellix_http_redirection" "http1" {
 ## Argument Reference ##
 * `ttl` - (Required) TTL must be in between 0 and 2147483647
 * `url` - (Required) URL link to redirect
-* `redirect_type_id` - (Required) 1 for Hidden Frame Masked, 2 for Standard - 301, 3 for Standard - 302
+* `redirect_type_id` - (Required) 1 for Standard - 302, 2 for Hidden Frame Masked and 3 for Standard - 301. 
 * `source_type` - (Required) "domains" for Domain records and "template" for Template records
 * `name` - (Optional) Name of record. Name should be unique.
 * `noanswer` - (Optional) Shows if record is enabled or disabled. Default is false (Active)

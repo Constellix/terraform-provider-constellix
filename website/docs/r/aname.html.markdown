@@ -55,13 +55,10 @@ resource "constellix_aname_record" "aname_record1" {
 * `ttl` - (Required) TTL must be in between 0 and 2147483647
 * `source_type` - (Required) "domains" for Domain records and "template" for Template records
 * `geo_location` - (Optional) Details of IP filter / Geo proximity to be applied. Default is null.
-* `geo_location.geo_ip_user_region` - (Optional) For Geo proximity to be applied. geoipUserRegion should not be provided.
 * `geo_location.drop` - (Optional) drop flag. Default is false.
 * `geo_location.geo_ip_proximity` - (Optional) a valid geoipProximity id.
 * `geo_location.geo_ip_user_region` - (Optional) For Geo IP Filter to be applied. geoipUserRegion should be [1].
-* `geo_location.drop` - (Optional) drop flag. Default is false.
 * `geo_location.geo_ip_failover` - (Optional) Flag to enable/disable Failover to nearest proximity when all the host fails. Works with the record type pools. It requires Geo Proximity to be enabled at the Domain level. Default is false. 
-* `geo_location.geo_ip_proximity` - (Optional) for Geo IP Filter, geoipProximity must not be provided. please create an A record with "World (Default)" IP Filter first before a more specific IP Filter is applied. The "World (Default)" record would only be used if no matching Filter or Proximity records are found.
 * `roundrobin` - (Required) Set
 * `roundrobin.value` - (Required) Host name. If "Host" value does not end in a dot, your domain name will be appended to it.
 * `roundrobin.disable_flag` - (Required) Enable or Disable the roundrobin object. Default is false. Atleast one roundrobin object should be false.
