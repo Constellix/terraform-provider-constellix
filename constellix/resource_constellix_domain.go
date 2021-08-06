@@ -403,7 +403,6 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 		domainAttr.Soa = soaAttr
 	}
 
-	log.Println("Update domainAttr: ", domainAttr)
 	dn := d.Id()
 
 	_, err := constellixClient.UpdatebyID(domainAttr, "v1/domains/"+dn)

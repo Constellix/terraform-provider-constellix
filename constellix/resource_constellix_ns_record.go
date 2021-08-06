@@ -174,7 +174,6 @@ func resourceConstellixNSCreate(d *schema.ResourceData, m interface{}) error {
 	json.Unmarshal([]byte(bodystring[1:len(bodystring)-1]), &data)
 
 	d.SetId(fmt.Sprintf("%.0f", data["id"]))
-	log.Println("NS Record ID is: ", d.Id())
 
 	return resourceConstellixNSRead(d, m)
 }
