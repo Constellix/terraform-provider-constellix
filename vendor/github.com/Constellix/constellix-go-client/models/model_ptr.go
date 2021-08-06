@@ -9,7 +9,7 @@ type RRPtr struct {
 type PtrAttributes struct {
 	Name       string        `json:"name,omitempty"`
 	TTL        int           `json:"ttl"`
-	NoAnswer   string        `json:"noanswer,omitempty"`
+	NoAnswer   bool 				 `json:"noanswer"`
 	Note       string        `json:"note,omitempty"`
 	GtdRegion  int           `json:"gtdregion,omitempty"`
 	Type       string        `json:"type,omitempty"`

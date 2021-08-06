@@ -83,7 +83,8 @@ func resourceConstellixDomain() *schema.Resource {
 
 						"email": &schema.Schema{
 							Type:     schema.TypeString,
-							Required: true,
+							Optional: true,
+							Computed: true,
 						},
 
 						"ttl": &schema.Schema{
@@ -150,22 +151,22 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	}
 
 	soaset := make(map[string]interface{})
-	soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
-	soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
-	if value, ok := d.GetOk("soa"); ok {
-		tp := value.(map[string]interface{})
-		if tp["email"] != nil {
-			soaset["email"] = stripQuotes(obj.S("soa", "email").String())
-		}
+
+	if obj.Exists("soa") {
+		soaset["email"] = stripQuotes(obj.S("soa", "email").String())
+		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
+		soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
+		soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
+		soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
+		soaset["retry"] = stripQuotes(obj.S("soa", "retry").String())
+		soaset["negcache"] = stripQuotes(obj.S("soa", "negCache").String())
+		soaset["serial"] = stripQuotes(obj.S("soa", "serial").String())
 	}
-	soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
-	soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
-	soaset["retry"] = stripQuotes(obj.S("soa", "retry").String())
-	soaset["negcache"] = stripQuotes(obj.S("soa", "negCache").String())
 
 	d.Set("id", stripQuotes(obj.S("id").String()))
 	d.Set("name", stripQuotes(obj.S("name").String()))
 	d.Set("soa", soaset)
+
 	if hasGeoIP, err := strconv.ParseBool(stripQuotes(obj.S("hasGeoIP").String())); err == nil {
 		d.Set("has_geoip", hasGeoIP)
 	}
@@ -233,10 +234,10 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 		soaAttr = &models.Soa{}
 		tp := value.(map[string]interface{})
 		if tp["primary_nameserver"] != nil {
-			soaAttr.PrimaryNameServer = fmt.Sprintf("%v", tp["primary_nameserver"])
+			soaAttr.PrimaryNameServer = tp["primary_nameserver"].(string)
 		}
 		if tp["email"] != nil {
-			soaAttr.Email = fmt.Sprintf("%v", tp["email"])
+			soaAttr.Email = tp["email"].(string)
 		}
 		if tp["ttl"] != nil {
 			soaAttr.TTL = tp["ttl"].(string)
@@ -296,22 +297,22 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	soaset := make(map[string]interface{})
-	soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
-	soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
-	if value, ok := d.GetOk("soa"); ok {
-		tp := value.(map[string]interface{})
-		if tp["email"] != nil {
-			soaset["email"] = stripQuotes(obj.S("soa", "email").String())
-		}
+
+	if obj.Exists("soa") {
+		soaset["email"] = stripQuotes(obj.S("soa", "email").String())
+		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
+		soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
+		soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
+		soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
+		soaset["retry"] = stripQuotes(obj.S("soa", "retry").String())
+		soaset["negcache"] = stripQuotes(obj.S("soa", "negCache").String())
+		soaset["serial"] = stripQuotes(obj.S("soa", "serial").String())
 	}
-	soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
-	soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
-	soaset["retry"] = stripQuotes(obj.S("soa", "retry").String())
-	soaset["negcache"] = stripQuotes(obj.S("soa", "negCache").String())
 
 	d.Set("id", stripQuotes(obj.S("id").String()))
 	d.Set("name", stripQuotes(obj.S("name").String()))
 	d.Set("soa", soaset)
+
 	if hasGeoIP, err := strconv.ParseBool(stripQuotes(obj.S("hasGeoIP").String())); err == nil {
 		d.Set("has_geoip", hasGeoIP)
 	}
@@ -342,56 +343,67 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 
 	domainAttr := models.DomainAttributes{}
 
-	domainAttr.HasGtdRegions = d.Get("has_gtd_regions").(bool)
-
-	domainAttr.HasGeoIP = d.Get("has_geoip").(bool)
-
-	if vanityNS, ok := d.GetOk("vanity_nameserver"); ok {
-		domainAttr.VanityNameServer = vanityNS.(string)
+	if d.HasChange("has_gtd_regions") {
+		domainAttr.HasGtdRegions = d.Get("has_gtd_regions").(bool)
 	}
 
-	if _, ok := d.GetOk("nameserver_group"); ok {
+	if d.HasChange("has_geoip") {
+		domainAttr.HasGeoIP = d.Get("has_geoip").(bool)
+	}
+
+	if d.HasChange("vanity_nameserver") {
+		domainAttr.VanityNameServer = d.Get("vanity_nameserver").(string)
+	}
+
+	if d.HasChange("nameserver_group") {
 		domainAttr.NameserverGroup = d.Get("nameserver_group").(string)
 	}
 
-	if _, ok := d.GetOk("note"); ok {
+	if d.HasChange("note") {
 		domainAttr.Note = d.Get("note").(string)
 	}
 
 	if d.HasChange("tags") {
-		tagsList := d.Get("tags").([]interface{})
-		domainAttr.Tags = tagsList
+		if tg, ok := d.GetOk("tags"); ok {
+			tagsList := tg.([]interface{})
+			domainAttr.Tags = tagsList
+		} else {
+			domainAttr.Tags = make([]interface{}, 0, 1)
+		}
 	}
 
 	var soaAttr *models.Soa
+	if d.HasChange("soa") {
+		if value, ok := d.GetOk("soa"); ok {
+			soaAttr = &models.Soa{}
+			tp := value.(map[string]interface{})
+			if tp["primary_nameserver"] != nil {
+				soaAttr.PrimaryNameServer = fmt.Sprintf("%v", tp["primary_nameserver"])
+			}
+			if tp["email"] != nil {
+				soaAttr.Email = fmt.Sprintf("%v", tp["email"])
+			}
+			if tp["ttl"] != nil {
+				soaAttr.TTL = tp["ttl"].(string)
+			}
+			if tp["expire"] != nil {
+				soaAttr.Expire = tp["expire"].(string)
+			}
+			if tp["negcache"] != nil {
+				soaAttr.NegCache = tp["negcache"].(string)
+			}
+			if tp["refresh"] != nil {
+				soaAttr.Refresh = tp["refresh"].(string)
+			}
+			if tp["retry"] != nil {
+				soaAttr.Retry = tp["retry"].(string)
+			}
+		}
 
-	value := d.Get("soa")
-	soaAttr = &models.Soa{}
-	tp := value.(map[string]interface{})
-	if tp["primary_nameserver"] != nil {
-		soaAttr.PrimaryNameServer = fmt.Sprintf("%v", tp["primary_nameserver"])
-	}
-	if tp["email"] != nil {
-		soaAttr.Email = fmt.Sprintf("%v", tp["email"])
-	}
-	if tp["ttl"] != nil {
-		soaAttr.TTL = tp["ttl"].(string)
-	}
-	if tp["expire"] != nil {
-		soaAttr.Expire = tp["expire"].(string)
-	}
-	if tp["negcache"] != nil {
-		soaAttr.NegCache = tp["negcache"].(string)
-	}
-	if tp["refresh"] != nil {
-		soaAttr.Refresh = tp["refresh"].(string)
-	}
-	if tp["retry"] != nil {
-		soaAttr.Retry = tp["retry"].(string)
+		domainAttr.Soa = soaAttr
 	}
 
-	domainAttr.Soa = soaAttr
-
+	log.Println("Update domainAttr: ", domainAttr)
 	dn := d.Id()
 
 	_, err := constellixClient.UpdatebyID(domainAttr, "v1/domains/"+dn)
@@ -399,7 +411,6 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 	return resourceConstellixDNSRead(d, m)
-
 }
 
 func resourceConstellixDNSDelete(d *schema.ResourceData, m interface{}) error {

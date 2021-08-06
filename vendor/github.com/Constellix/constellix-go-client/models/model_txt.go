@@ -9,7 +9,7 @@ type RRTxt struct {
 type TxtAttributes struct {
 	Name       string        `json:"name,omitempty"`
 	TTL        int           `json:"ttl"`
-	NoAnswer   string        `json:"noanswer,omitempty"`
+	NoAnswer   string        `json:"noanswer"`
 	Note       string        `json:"note,omitempty"`
 	GtdRegion  int           `json:"gtdregion,omitempty"`
 	Type       string        `json:"type,omitempty"`

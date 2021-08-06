@@ -126,6 +126,7 @@ func resourceConstellixNSImport(d *schema.ResourceData, m interface{}) ([]*schem
 	log.Printf("[DEBUG] %s finished import", d.Id())
 	return []*schema.ResourceData{d}, nil
 }
+
 func resourceConstellixNSCreate(d *schema.ResourceData, m interface{}) error {
 	constellixConnect := m.(*client.Client)
 
@@ -173,6 +174,8 @@ func resourceConstellixNSCreate(d *schema.ResourceData, m interface{}) error {
 	json.Unmarshal([]byte(bodystring[1:len(bodystring)-1]), &data)
 
 	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	log.Println("NS Record ID is: ", d.Id())
+
 	return resourceConstellixNSRead(d, m)
 }
 
@@ -180,7 +183,8 @@ func resourceConstellixNSDelete(d *schema.ResourceData, m interface{}) error {
 	constellixConnect := m.(*client.Client)
 
 	dn := d.Id()
-	err := constellixConnect.DeletebyId("v1/" + d.Get("source_type").(string) + "/" + d.Get("domain_id").(string) + "/records/ns" + dn)
+
+	err := constellixConnect.DeletebyId("v1/" + d.Get("source_type").(string) + "/" + d.Get("domain_id").(string) + "/records/ns/" + dn)
 	if err != nil {
 		return err
 	}
