@@ -56,7 +56,7 @@ func datasourceConstellixAAAArecordpool() *schema.Resource {
 						},
 
 						"weight": &schema.Schema{
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Required: true,
 						},
 

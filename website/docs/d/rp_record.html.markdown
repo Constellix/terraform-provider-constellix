@@ -34,5 +34,5 @@ data "constellix_rp_record" "datarp" {
 * `name` - (Required) Name of record. Name should be unique.
 * `noanswer` - (Optional) Shows if record is enabled or disabled. Default is false (Active)
 * `note` - (Optional) Record note
-* `gtd_region` - (Optional) Shows id of GTD region in which record is to be created, 1 for World (Default), 2 for Europe, 3 for US East, 4 for US West, 5 for Asia Pacific, 6 for Oceania, note: "gtdRegion" from 2 to 6 will be applied only when GTD region is enabled on domain.
+* `gtd_region` - (Optional) Shows id of GTD region in which record is to be created.
 * `type` - (Optional) Record type RP

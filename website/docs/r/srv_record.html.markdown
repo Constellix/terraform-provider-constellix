@@ -33,6 +33,7 @@ resource "constellix_srv_record" "srvrecord1" {
 ```
 
 ## Argument Reference ##
+* `domain_id` - (Required) Record id of SRV record
 * `ttl` - (Required) TTL must be in between 0 and 2147483647
 * `source_type` - (Required) "domains" for Domain records and "template" for Template records
 * `roundrobin` - (Required) Set

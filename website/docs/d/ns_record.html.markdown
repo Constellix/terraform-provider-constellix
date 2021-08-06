@@ -29,7 +29,7 @@ data "constellix_ns_record" "firstrecord" {
 * `ttl` - (Optional) TTL must be in between 0 and 2147483647.
 * `noanswer` - (Optional) Shows if record is enabled or disabled. Default is false (Active).
 * `note` - (Optional)Record note.
-* `gtd_region` - (Optional) Shows id of GTD region in which record is to be created. 1 for World (Default). 2 for Europe. 3 for US East. 4 for US West. 5 for Asia Pacific. 6 for Oceania. note: "gtdRegion" from 2 to 6 will be applied only when GTD region is enabled on domain.
+* `gtd_region` - (Optional) Shows id of GTD region in which record is to be created.
 * `type` - (Optional) Record type NS.
 * `roundrobin` - (Optional) Set.
 * `roundrobin.value` - (Optional) This will be the host name for the name server, for example ns0.nameserver.com. It is important to note, the domain name is automatically appended to the end of this field unless it ends with a dot (.).

@@ -29,7 +29,7 @@ func resourceConstellixContactList() *schema.Resource {
 				ForceNew: true,
 			},
 			"email_addresses": &schema.Schema{
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
@@ -59,7 +59,7 @@ func resourceConstellixContactListImport(d *schema.ResourceData, m interface{}) 
 
 	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
-	d.Set("email_addresses", data["emailAddresses"])
+	d.Set("email_addresses", data["emailAddresses"].([]interface{}))
 	log.Printf("[DEBUG] %s finished import", d.Id())
 	return []*schema.ResourceData{d}, nil
 }
@@ -72,8 +72,12 @@ func resourceConstellixContactListCreate(d *schema.ResourceData, m interface{}) 
 	}
 
 	if contactemails, ok := d.GetOk("email_addresses"); ok {
-		contactemailsList := toListOfString(contactemails)
-		contactlistAttr.EmailAddresses = contactemailsList
+		var contactemailList = contactemails.(*schema.Set).List()
+		emailList := make([]string, 0, 1)
+		for _, val := range contactemailList {
+			emailList = append(emailList, val.(string))
+		}
+		contactlistAttr.EmailAddresses = emailList
 	}
 
 	resp, err := client.Save(contactlistAttr, "v2/contactLists")
@@ -90,9 +94,8 @@ func resourceConstellixContactListCreate(d *schema.ResourceData, m interface{}) 
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodystring), &data)
 	idstruct := data["successContactLists"].([]interface{})[0]
-	var idStruct map[string]interface{}
 
-	idStruct = idstruct.(map[string]interface{})
+	var idStruct = idstruct.(map[string]interface{})
 
 	d.SetId(fmt.Sprintf("%.0f", idStruct["id"]))
 	return resourceConstellixContactListRead(d, m)
@@ -104,10 +107,13 @@ func resourceConstellixcontactListUpdate(d *schema.ResourceData, m interface{}) 
 
 	contactlistAttr.Name = d.Get("name").(string)
 
-	if _, ok := d.GetOk("email_addresses"); ok {
-		contactemaillist := toListOfString(d.Get("email_addresses"))
-		contactlistAttr.EmailAddresses = contactemaillist
-
+	if contactemails, ok := d.GetOk("email_addresses"); ok {
+		var contactemailList = contactemails.(*schema.Set).List()
+		emailList := make([]string, 0, 1)
+		for _, val := range contactemailList {
+			emailList = append(emailList, val.(string))
+		}
+		contactlistAttr.EmailAddresses = emailList
 	}
 
 	cid := d.Id()
@@ -140,7 +146,7 @@ func resourceConstellixContactListRead(d *schema.ResourceData, m interface{}) er
 
 	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("name", data["name"])
-	d.Set("email_addresses", data["emailAddresses"])
+	d.Set("email_addresses", data["emailAddresses"].([]interface{}))
 	return nil
 }
 
