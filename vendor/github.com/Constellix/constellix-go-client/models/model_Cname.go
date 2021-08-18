@@ -31,7 +31,7 @@ type CRecordAttributes struct {
 	Note            string              `json:"note,omitempty"`
 	GtdRegion       int                 `json:"gtdRegion,omitempty"`
 	Type            string              `json:"type,omitempty"`
-	ContactId       []int               `json:"contactId,omitempty"`
+	ContactId       []int               `json:"contactIds,omitempty"`
 	Pools           []int               `json:"pools,omitempty"`
 	RecordFailoverA *RCDFACRecord       `json:"recordFailover,omitempty"`
 }

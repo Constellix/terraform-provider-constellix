@@ -83,8 +83,7 @@ func resourceConstellixDomain() *schema.Resource {
 
 						"email": &schema.Schema{
 							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Required: true,
 						},
 
 						"ttl": &schema.Schema{
@@ -152,15 +151,20 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 
 	soaset := make(map[string]interface{})
 
+	if value, ok := d.GetOk("soa"); ok {
+		tp := value.(map[string]interface{})
+		if tp["email"] != nil {
+			soaset["email"] = stripQuotes(obj.S("soa", "email").String())
+		}
+	}
+
 	if obj.Exists("soa") {
-		soaset["email"] = stripQuotes(obj.S("soa", "email").String())
 		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
 		soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
 		soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
 		soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
 		soaset["retry"] = stripQuotes(obj.S("soa", "retry").String())
 		soaset["negcache"] = stripQuotes(obj.S("soa", "negCache").String())
-		soaset["serial"] = stripQuotes(obj.S("soa", "serial").String())
 	}
 
 	d.Set("id", stripQuotes(obj.S("id").String()))
@@ -298,15 +302,20 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 
 	soaset := make(map[string]interface{})
 
+	if value, ok := d.GetOk("soa"); ok {
+		tp := value.(map[string]interface{})
+		if tp["email"] != nil {
+			soaset["email"] = stripQuotes(obj.S("soa", "email").String())
+		}
+	}
+
 	if obj.Exists("soa") {
-		soaset["email"] = stripQuotes(obj.S("soa", "email").String())
 		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
 		soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
 		soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
 		soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
 		soaset["retry"] = stripQuotes(obj.S("soa", "retry").String())
 		soaset["negcache"] = stripQuotes(obj.S("soa", "negCache").String())
-		soaset["serial"] = stripQuotes(obj.S("soa", "serial").String())
 	}
 
 	d.Set("id", stripQuotes(obj.S("id").String()))

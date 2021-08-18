@@ -268,7 +268,7 @@ func resourceConstellixANAMERecordImport(d *schema.ResourceData, m interface{}) 
 	d.Set("pools", data["pools"])
 	d.Set("gtd_region", data["gtdRegion"])
 	d.Set("type", data["type"])
-	d.Set("contact_ids", data["contactids"])
+	d.Set("contact_ids", data["contactIds"])
 	d.Set("roundrobin", rrlist)
 	d.Set("record_failover_values", rcdflist)
 	d.Set("record_failover_failover_type", rcdfSet["record_failover_failover_type"])
@@ -313,19 +313,8 @@ func resourceConstellixANAMERecordCreate(d *schema.ResourceData, m interface{}) 
 		anameAttr.Pools = toListOfInt(pools)
 	}
 
-	if contactids, ok := d.GetOk("contact_ids"); ok {
-		contactidList := toStringList(contactids.([]interface{}))
-		var intlist []int
-		intlist = make([]int, len(contactidList))
-		for _, i := range contactidList {
-			j, err := strconv.Atoi(i)
-			if err != nil {
-				panic(err)
-			}
-			intlist = append(intlist, j)
-		}
-
-		anameAttr.ContactIDs = intlist
+	if contactid, ok := d.GetOk("contact_ids"); ok {
+		anameAttr.ContactIDs = toListOfInt(contactid)
 	}
 
 	geoloc := &models.GeolocationANAME{}
@@ -493,7 +482,7 @@ func resourceConstellixANAMERecordRead(d *schema.ResourceData, m interface{}) er
 	d.Set("pools", data["pools"])
 	d.Set("gtd_region", data["gtdRegion"])
 	d.Set("type", data["type"])
-	d.Set("contact_ids", data["contactids"])
+	d.Set("contact_ids", data["contactIds"])
 	d.Set("roundrobin", rrlist)
 	d.Set("record_failover_values", rcdflist)
 	d.Set("record_failover_failover_type", rcdfSet["record_failover_failover_type"])
@@ -539,19 +528,8 @@ func resourceConstellixANAMERecordUpdate(d *schema.ResourceData, m interface{}) 
 		anameAttr.Pools = toListOfInt(pools)
 	}
 
-	if _, ok := d.GetOk("contact_ids"); ok {
-
-		contactidslist := toStringList(d.Get("contact_ids").([]interface{}))
-		var intlist []int
-		intlist = make([]int, len(contactidslist))
-		for _, i := range contactidslist {
-			j, err := strconv.Atoi(i)
-			if err != nil {
-				panic(err)
-			}
-			intlist = append(intlist, j)
-		}
-		anameAttr.ContactIDs = intlist
+	if contactid, ok := d.GetOk("contact_ids"); ok {
+		anameAttr.ContactIDs = toListOfInt(contactid)
 	}
 
 	geoloc := &models.GeolocationANAME{}

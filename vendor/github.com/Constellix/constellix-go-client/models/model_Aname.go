@@ -8,7 +8,7 @@ type AnameAttributes struct {
 	Note                string            `json:"note,omitempty"`
 	GtdRegion           int               `json:"gtdRegion,omitempty"`
 	Type                string            `json:"type,omitempty"`
-	ContactIDs          []int             `json:"contactids,omitempty"`
+	ContactIDs          []int             `json:"contactIds,omitempty"`
 	RoundRobin          []interface{}     `json:"roundRobin,omitempty"`
 	Pools               []int             `json:"pools,omitempty"`
 	GeoLocation         *GeolocationANAME `json:"geolocation,omitempty"`
