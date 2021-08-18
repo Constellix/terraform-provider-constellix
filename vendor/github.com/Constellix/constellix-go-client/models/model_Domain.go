@@ -12,12 +12,12 @@ type Soa struct {
 }
 
 type DomainAttributes struct {
-	Name             []string      `json:"names"`
+	Name             []string      `json:"names,omitempty"`
 	TypeID           int           `json:"typeId,omitempty"`
-	HasGtdRegions    bool          `json:"hasGtdRegions,omitempty"`
-	HasGeoIP         bool          `json:"hasGeoIP,omitempty"`
+	HasGtdRegions    bool          `json:"hasGtdRegions"`
+	HasGeoIP         bool          `json:"hasGeoIP"`
 	NameserverGroup  string        `json:"nameserverGroup,omitempty"`
-	VanityNameServer string        `json:"vanityNameServer"`
+	VanityNameServer string        `json:"vanityNameServer,omitempty"`
 	Nameservers      []string      `json:"nameservers,omitempty"`
 	Note             string        `json:"note,omitempty"`
 	Version          int           `json:"version,omitempty"`

@@ -3,7 +3,7 @@ package models
 type NSAttributes struct {
 	Name       string        `json:"name,omitempty"`
 	Ttl        int           `json:"ttl"`
-	NoAnswer   bool          `json:"noAnswer,omitempty"`
+	NoAnswer   bool          `json:"noAnswer"`
 	RoundRobin []interface{} `json:"roundRobin"`
 	Note       string        `json:"note,omitempty"`
 	GtdRegion  int           `json:"gtdRegion,omitempty"`
@@ -12,5 +12,5 @@ type NSAttributes struct {
 
 type RoundRobinNS struct {
 	Value       string `json:"value,omitempty"`
-	DisableFlag bool   `json:"disableFlag,omitempty"`
+	DisableFlag bool   `json:"disableFlag"`
 }

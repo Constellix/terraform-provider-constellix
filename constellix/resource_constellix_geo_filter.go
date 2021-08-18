@@ -33,7 +33,7 @@ func resourceConstellixIPFilter() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Required: true,
+				Optional: true,
 			},
 			"geoip_regions": &schema.Schema{
 				Type: schema.TypeList,

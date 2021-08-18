@@ -169,7 +169,7 @@ func resourceConstellixPtrCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if noans, ok := d.GetOk("noanswer"); ok {
-		PtrAttr.NoAnswer = noans.(string)
+		PtrAttr.NoAnswer = noans.(bool)
 	}
 
 	if note, ok := d.GetOk("note"); ok {
@@ -244,7 +244,7 @@ func resourceConstellixPtrUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if noans, ok := d.GetOk("noanswer"); ok {
-		PtrAttr.NoAnswer = noans.(string)
+		PtrAttr.NoAnswer = noans.(bool)
 	}
 
 	if _, ok := d.GetOk("note"); ok {

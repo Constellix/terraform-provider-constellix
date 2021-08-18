@@ -17,7 +17,7 @@ type IPFilterAttributes struct {
 	// Id              int      `json:"id,omitempty"`
 	Name             string        `json:"name"`
 	GeoIPContinents  []string      `json:"geoipContinents,omitempty"`
-	GeoIPRegions     []string      `json:"geoipRegions,omitempty"`
+	GeoIPRegions     []string      `json:"regions,omitempty"`
 	GeoIPCountries   []string      `json:"geoipCountries,omitempty"`
 	Asn              []int         `json:"asn,omitempty"`
 	FilterRulesLimit int           `json:"filterRulesLimit,omitempty"`

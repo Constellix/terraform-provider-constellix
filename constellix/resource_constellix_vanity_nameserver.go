@@ -105,7 +105,7 @@ func resourceConstellixVanityNameserverCreate(d *schema.ResourceData, m interfac
 	}
 
 	if ispub, ok := d.GetOk("is_public"); ok {
-		model.IsDefault = ispub.(bool)
+		model.IsPublic = ispub.(bool)
 	}
 
 	if group, ok := d.GetOk("nameserver_group"); ok {
@@ -147,20 +147,20 @@ func resourceConstellixVanityNameserverUpdate(d *schema.ResourceData, m interfac
 		model.Name = name.(string)
 	}
 
-	if _, ok := d.GetOk("is_default"); ok {
-		model.IsDefault = d.Get("is_default").(bool)
+	if isdef, ok := d.GetOk("is_default"); ok {
+		model.IsDefault = isdef.(bool)
 	}
 
-	if _, ok := d.GetOk("is_public"); ok {
-		model.IsDefault = d.Get("is_public").(bool)
+	if ispub, ok := d.GetOk("is_public"); ok {
+		model.IsPublic = ispub.(bool)
 	}
 
 	if group, ok := d.GetOk("nameserver_group"); ok {
 		model.NameserverGroup = group.(int)
 	}
 
-	if _, ok := d.GetOk("nameserver_group_name"); ok {
-		model.NameserverGroupName = d.Get("nameserver_group_name").(string)
+	if gname, ok := d.GetOk("nameserver_group_name"); ok {
+		model.NameserverGroupName = gname.(string)
 	}
 
 	if liststr, ok := d.GetOk("nameserver_list_string"); ok {
