@@ -150,7 +150,6 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	}
 
 	soaset := make(map[string]interface{})
-
 	if value, ok := d.GetOk("soa"); ok {
 		tp := value.(map[string]interface{})
 		if tp["email"] != nil {
@@ -301,14 +300,12 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	soaset := make(map[string]interface{})
-
 	if value, ok := d.GetOk("soa"); ok {
 		tp := value.(map[string]interface{})
 		if tp["email"] != nil {
 			soaset["email"] = stripQuotes(obj.S("soa", "email").String())
 		}
 	}
-
 	if obj.Exists("soa") {
 		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
 		soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
