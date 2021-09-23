@@ -62,6 +62,12 @@ func resourceConstellixDomain() *schema.Resource {
 				Computed: true,
 			},
 
+			"template": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
+
 			"tags": &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
@@ -227,6 +233,10 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 		domainAttr.Note = note.(string)
 	}
 
+	if template, ok := d.GetOk("template"); ok {
+		domainAttr.Template = template.(int)
+	}
+
 	if tg, ok := d.GetOk("tags"); ok {
 		tagsList := tg.([]interface{})
 		domainAttr.Tags = tagsList
@@ -334,6 +344,9 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	if obj.Exists("note") && obj.S("note").String() != "{}" {
 		d.Set("note", stripQuotes(obj.S("note").String()))
 	}
+	if obj.Exists("template") && obj.S("template").String() != "{}" {
+		d.Set("template", stripQuotes(obj.S("template").String()))
+	}
 
 	if obj.S("tags").Data() != nil {
 		d.Set("tags", toListOfString(obj.S("tags").Data()))
@@ -367,6 +380,10 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 
 	if d.HasChange("note") {
 		domainAttr.Note = d.Get("note").(string)
+	}
+
+	if d.HasChange("template") {
+		domainAttr.Template = d.Get("template").(int)
 	}
 
 	if d.HasChange("tags") {
