@@ -23,5 +23,6 @@ type DomainAttributes struct {
 	Version          int           `json:"version,omitempty"`
 	Status           string        `json:"status,omitempty"`
 	Tags             []interface{} `json:"tags,omitempty"`
+	Template         int           `json:"template,omitempty"`
 	Soa              *Soa          `json:"soa,omitempty"`
 }
