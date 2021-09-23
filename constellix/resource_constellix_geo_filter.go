@@ -281,6 +281,7 @@ func resourceConstellixIPFilterRead(d *schema.ResourceData, m interface{}) error
 					ipv4List = append(ipv4List, temp.(string))
 				}
 				d.Set("ipv4", ipv4List)
+				d.Set("ipv6", make([]string, 0, 1))
 
 			} else {
 				ipv6s := tp["ipv6Addresses"].([]interface{})
@@ -290,9 +291,12 @@ func resourceConstellixIPFilterRead(d *schema.ResourceData, m interface{}) error
 					ipv6List = append(ipv6List, temp.(string))
 				}
 				d.Set("ipv6", ipv6List)
-
+				d.Set("ipv4", make([]string, 0, 1))
 			}
 		}
+	} else {
+		d.Set("ipv6", make([]string, 0, 1))
+		d.Set("ipv4", make([]string, 0, 1))
 	}
 	d.SetId(fmt.Sprintf("%.0f", data["id"]))
 	d.Set("geoip_regions", geoipregionsList)
