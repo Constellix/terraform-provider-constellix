@@ -2,7 +2,6 @@ package constellix
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"

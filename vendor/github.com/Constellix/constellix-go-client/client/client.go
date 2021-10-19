@@ -92,6 +92,7 @@ func (c *Client) useInsecureHTTPClient(insecure bool) *http.Transport {
 	return transport
 }
 
+
 func (c *Client) configProxy(transport *http.Transport) *http.Transport {
 	pUrl, err := url.Parse(c.proxyurl)
 	if err != nil {
