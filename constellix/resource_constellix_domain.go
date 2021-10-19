@@ -191,6 +191,7 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	if obj.Exists("note") && obj.S("note").String() != "{}" {
 		d.Set("note", stripQuotes(obj.S("note").String()))
 	}
+
 	if obj.Exists("template") && obj.S("template").String() != "{}" {
 		d.Set("template", stripQuotes(obj.S("template").String()))
 	}
@@ -364,6 +365,7 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 
 func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 	constellixClient := m.(*client.Client)
+	dn := d.Id()
 
 	domainAttr := models.DomainAttributes{}
 	if hasGTDRegion, ok := d.GetOk("has_gtd_regions"); ok {
@@ -387,7 +389,13 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if d.HasChange("template") {
-		domainAttr.Template = d.Get("template").(int)
+		templatePayload := map[string]int{
+			"template": d.Get("template").(int),
+		}
+		_, err := constellixClient.UpdatebyID(templatePayload, "v1/domains/"+dn)
+		if err != nil {
+			return err
+		}
 	}
 
 	if d.HasChange("tags") {
@@ -429,9 +437,6 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 
 		domainAttr.Soa = soaAttr
 	}
-
-	dn := d.Id()
-
 	_, err := constellixClient.UpdatebyID(domainAttr, "v1/domains/"+dn)
 	if err != nil {
 		return err
