@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -175,7 +176,16 @@ func resourceConstellixIPFilterCreate(d *schema.ResourceData, m interface{}) err
 		ipfilterattr.Asn = toListOfInt(asn)
 	}
 	if geoipregions, ok := d.GetOk("geoip_regions"); ok {
-		ipfilterattr.GeoIPRegions = toListOfString(geoipregions)
+		regionMapList := make([]interface{}, 0)
+		for _, regionString := range geoipregions.([]interface{}) {
+			regionList := strings.Split(regionString.(string), "/")
+			regionMapList = append(regionMapList, map[string]interface{}{
+				"countryCode": regionList[0],
+				"regionCode":  regionList[1],
+			})
+		}
+
+		ipfilterattr.GeoIPRegions = regionMapList
 	}
 	if filterruleslimit, ok := d.GetOk("filter_rules_limit"); ok {
 		ipfilterattr.FilterRulesLimit = filterruleslimit.(int)
@@ -281,7 +291,6 @@ func resourceConstellixIPFilterRead(d *schema.ResourceData, m interface{}) error
 					ipv4List = append(ipv4List, temp.(string))
 				}
 				d.Set("ipv4", ipv4List)
-				d.Set("ipv6", make([]string, 0, 1))
 
 			} else {
 				ipv6s := tp["ipv6Addresses"].([]interface{})
@@ -291,7 +300,6 @@ func resourceConstellixIPFilterRead(d *schema.ResourceData, m interface{}) error
 					ipv6List = append(ipv6List, temp.(string))
 				}
 				d.Set("ipv6", ipv6List)
-				d.Set("ipv4", make([]string, 0, 1))
 			}
 		}
 	} else {
@@ -336,7 +344,16 @@ func resourceConstellixIPFilterUpdate(d *schema.ResourceData, m interface{}) err
 		ipfilterattr.GeoIPCountries = toListOfString(geoipcountries)
 	}
 	if geoipregions, ok := d.GetOk("geoip_regions"); ok {
-		ipfilterattr.GeoIPRegions = toListOfString(geoipregions)
+		regionMapList := make([]interface{}, 0)
+		for _, regionString := range geoipregions.([]interface{}) {
+			regionList := strings.Split(regionString.(string), "/")
+			regionMapList = append(regionMapList, map[string]interface{}{
+				"countryCode": regionList[0],
+				"regionCode":  regionList[1],
+			})
+		}
+
+		ipfilterattr.GeoIPRegions = regionMapList
 	}
 	if asn, ok := d.GetOk("asn"); ok {
 		ipfilterattr.Asn = toListOfInt(asn)

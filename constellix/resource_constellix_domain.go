@@ -65,7 +65,7 @@ func resourceConstellixDomain() *schema.Resource {
 			"template": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
-				Computed: true,
+				Default:  0,
 			},
 
 			"tags": &schema.Schema{
@@ -190,6 +190,9 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	}
 	if obj.Exists("note") && obj.S("note").String() != "{}" {
 		d.Set("note", stripQuotes(obj.S("note").String()))
+	}
+	if obj.Exists("template") && obj.S("template").String() != "{}" {
+		d.Set("template", stripQuotes(obj.S("template").String()))
 	}
 
 	if obj.S("tags").Data() != nil {
@@ -346,6 +349,8 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	}
 	if obj.Exists("template") && obj.S("template").String() != "{}" {
 		d.Set("template", stripQuotes(obj.S("template").String()))
+	} else {
+		d.Set("template", 0)
 	}
 
 	if obj.S("tags").Data() != nil {
@@ -361,13 +366,12 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 	constellixClient := m.(*client.Client)
 
 	domainAttr := models.DomainAttributes{}
-
-	if d.HasChange("has_gtd_regions") {
-		domainAttr.HasGtdRegions = d.Get("has_gtd_regions").(bool)
+	if hasGTDRegion, ok := d.GetOk("has_gtd_regions"); ok {
+		domainAttr.HasGtdRegions = hasGTDRegion.(bool)
 	}
 
-	if d.HasChange("has_geoip") {
-		domainAttr.HasGeoIP = d.Get("has_geoip").(bool)
+	if hasGeoIP, ok := d.GetOk("has_geoip"); ok {
+		domainAttr.HasGeoIP = hasGeoIP.(bool)
 	}
 
 	if d.HasChange("vanity_nameserver") {

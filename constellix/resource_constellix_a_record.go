@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -392,7 +393,7 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			maplist = append(maplist, map1)
 		}
-		aAttr.RoundRobinFailoverA = maplist
+		aAttr.RoundRobinFailoverA = sortAccordingToSortOrder(maplist)
 	}
 
 	valueslist := make([]interface{}, 0, 1)
@@ -408,7 +409,6 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
 			valueslist = append(valueslist, map1)
 		}
-		rcdfa.Values = valueslist
 
 		if failovertype, ok := d.GetOk("record_failover_failover_type"); ok {
 			rcdfa.FailoverTypeRCDFA, _ = strconv.Atoi(fmt.Sprintf("%v", failovertype)) //added
@@ -418,8 +418,8 @@ func resourceConstellixARecordCreate(d *schema.ResourceData, m interface{}) erro
 			rcdfa.DisableFlagRCDFA, _ = strconv.ParseBool(fmt.Sprintf("%v", disableflag)) //added
 		}
 
-		rcdfa.Values = valueslist     //added
-		aAttr.RecordFailoverA = rcdfa //added
+		rcdfa.Values = sortAccordingToSortOrder(valueslist) //added
+		aAttr.RecordFailoverA = rcdfa                       //added
 	}
 
 	resp, err := constellixConnect.Save(aAttr, "v1/"+d.Get("source_type").(string)+"/"+d.Get("domain_id").(string)+"/records/a")
@@ -630,7 +630,7 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 			map1["sortOrder"], _ = strconv.Atoi(fmt.Sprintf("%v", inner["sort_order"]))
 			maplist = append(maplist, map1)
 		}
-		aAttr.RoundRobinFailoverA = maplist
+		aAttr.RoundRobinFailoverA = sortAccordingToSortOrder(maplist)
 	}
 
 	valueslist := make([]interface{}, 0, 1)
@@ -646,7 +646,6 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 			map1["disableFlag"], _ = strconv.ParseBool(fmt.Sprintf("%v", inner["disable_flag"]))
 			valueslist = append(valueslist, map1)
 		}
-		rcdfa.Values = valueslist
 
 		if failovertype, ok := d.GetOk("record_failover_failover_type"); ok {
 			rcdfa.FailoverTypeRCDFA, _ = strconv.Atoi(fmt.Sprintf("%v", failovertype))
@@ -656,7 +655,7 @@ func resourceConstellixARecordUpdate(d *schema.ResourceData, m interface{}) erro
 			rcdfa.DisableFlagRCDFA, _ = strconv.ParseBool(fmt.Sprintf("%v", disableflag))
 		}
 
-		rcdfa.Values = valueslist
+		rcdfa.Values = sortAccordingToSortOrder(valueslist)
 		aAttr.RecordFailoverA = rcdfa
 	}
 
@@ -680,4 +679,28 @@ func resourceConstellixARecordDelete(d *schema.ResourceData, m interface{}) erro
 	}
 	d.SetId("")
 	return err
+}
+
+func sortAccordingToSortOrder(mapList []interface{}) []interface{} {
+	sortOrders := make([]int, 0)
+	sortOrdersMap := make(map[int]bool, 0)
+	for _, dict := range mapList {
+		sortOrdersMap[dict.(map[string]interface{})["sortOrder"].(int)] = true
+	}
+
+	for k, _ := range sortOrdersMap {
+		sortOrders = append(sortOrders, k)
+	}
+
+	sort.Ints(sortOrders)
+
+	sortedMapList := make([]interface{}, 0)
+	for _, order := range sortOrders {
+		for i := 0; i < len(mapList); i++ {
+			if mapList[i].(map[string]interface{})["sortOrder"].(int) == order {
+				sortedMapList = append(sortedMapList, mapList[i])
+			}
+		}
+	}
+	return sortedMapList
 }

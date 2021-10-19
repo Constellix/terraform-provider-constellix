@@ -2,7 +2,6 @@ package constellix
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -119,11 +118,6 @@ func configureClient(d *schema.ResourceData) (interface{}, error) {
 		return nil, err
 	}
 	cli := config.getClient()
-	if cli != nil {
-		log.Printf("clinirav is there %+v", cli)
-	} else {
-		log.Printf("clinirav is nil %v", cli)
-	}
 	return cli, nil
 }
 
