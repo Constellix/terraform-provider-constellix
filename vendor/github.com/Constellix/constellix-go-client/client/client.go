@@ -194,8 +194,9 @@ func checkForErrors(resp *http.Response) error {
 		json.Unmarshal([]byte(bodyString), &data)
 
 		var errors []interface{}
-		errors = data["errors"].([]interface{})
-
+		if data["errors"] != nil {
+			errors = data["errors"].([]interface{})
+		}
 		var allerrs string
 		for _, val := range errors {
 			allerrs = allerrs + val.(string)
