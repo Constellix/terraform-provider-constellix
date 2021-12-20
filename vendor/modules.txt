@@ -8,7 +8,7 @@ cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 # cloud.google.com/go/storage v1.10.0
 cloud.google.com/go/storage
-# github.com/Constellix/constellix-go-client v1.1.0
+# github.com/Constellix/constellix-go-client v1.1.1
 github.com/Constellix/constellix-go-client/client
 github.com/Constellix/constellix-go-client/models
 # github.com/Jeffail/gabs v1.4.0
