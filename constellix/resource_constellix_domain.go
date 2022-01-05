@@ -197,6 +197,8 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 
 	if obj.Exists("template") && obj.S("template").String() != "{}" {
 		d.Set("template", stripQuotes(obj.S("template").String()))
+	} else {
+		d.Set("template", 0)
 	}
 
 	if obj.S("tags").Data() != nil {
