@@ -201,6 +201,9 @@ func checkForErrors(resp *http.Response) error {
 		for _, val := range errors {
 			allerrs = allerrs + val.(string)
 		}
+		if allerrs == "" {
+			allerrs = fmt.Sprintf("%v", resp.StatusCode)
+		}
 		log.Println(" Errors are .....:: ", allerrs)
 		return fmt.Errorf("%s", allerrs)
 	}
