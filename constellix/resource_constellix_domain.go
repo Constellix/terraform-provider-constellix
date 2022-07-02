@@ -6,12 +6,15 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"sync"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
 	"github.com/Jeffail/gabs"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
+
+var mutex = sync.RWMutex{}
 
 func resourceConstellixDomain() *schema.Resource {
 	return &schema.Resource{
@@ -239,10 +242,6 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 		domainAttr.Note = note.(string)
 	}
 
-	if template, ok := d.GetOk("template"); ok {
-		domainAttr.Template = template.(int)
-	}
-
 	if tg, ok := d.GetOk("tags"); ok {
 		tagsList := tg.([]interface{})
 		domainAttr.Tags = tagsList
@@ -290,7 +289,21 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 	var data map[string]interface{}
 	json.Unmarshal([]byte(bodyString[1:len(bodyString)-1]), &data)
 
-	d.SetId(fmt.Sprintf("%.0f", data["id"]))
+	dn := fmt.Sprintf("%.0f", data["id"])
+	d.SetId(dn)
+
+	if _, ok := d.GetOk("template"); ok {
+		templatePayload := map[string]int{
+			"template": d.Get("template").(int),
+		}
+		mutex.Lock()
+		_, err = constellixConnect.UpdatebyID(templatePayload, "v1/domains/"+dn)
+		mutex.Unlock()
+		if err != nil {
+			return err
+		}
+	}
+
 	return resourceConstellixDNSRead(d, m)
 }
 
@@ -347,9 +360,11 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	if obj.Exists("nameserverGroup") {
 		d.Set("nameserver_group", stripQuotes(obj.S("nameserverGroup").String()))
 	}
+
 	if obj.Exists("note") && obj.S("note").String() != "{}" {
 		d.Set("note", stripQuotes(obj.S("note").String()))
 	}
+
 	if obj.Exists("template") && obj.S("template").String() != "{}" {
 		d.Set("template", stripQuotes(obj.S("template").String()))
 	} else {
@@ -391,7 +406,15 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if d.HasChange("template") {
-		domainAttr.Template = d.Get("template").(int)
+		templatePayload := map[string]int{
+			"template": d.Get("template").(int),
+		}
+		mutex.Lock()
+		_, err := constellixClient.UpdatebyID(templatePayload, "v1/domains/"+dn)
+		mutex.Unlock()
+		if err != nil {
+			return err
+		}
 	}
 
 	if d.HasChange("tags") {
@@ -445,7 +468,15 @@ func resourceConstellixDNSDelete(d *schema.ResourceData, m interface{}) error {
 
 	dn := d.Id()
 
-	err := constellixConnect.DeletebyId("v1/domains/" + dn)
+	templatePayload := map[string]int{
+		"template": 0,
+	}
+	_, err := constellixConnect.UpdatebyID(templatePayload, "v1/domains/"+dn)
+	if err != nil {
+		return err
+	}
+
+	err = constellixConnect.DeletebyId("v1/domains/" + dn)
 	if err != nil {
 		return err
 	}
