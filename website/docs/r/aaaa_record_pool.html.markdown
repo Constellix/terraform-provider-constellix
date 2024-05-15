@@ -14,7 +14,7 @@ description: |-
 ```hcl
 resource "constellix_aaaa_record_pool" "firstrecord" {
   name                   = "firstrecord"
-  num_return             = "10"
+  num_return             = 1
   min_available_failover = 1
   values {
     value        = "0:0:0:0:0:0:0:12"
@@ -32,13 +32,13 @@ resource "constellix_aaaa_record_pool" "firstrecord" {
 
 ## Argument Reference ##
 * `name` - (Required) Pool name should be unique.
-* `num_return` - (Required) minimum number of value object to return. Value must be in between 0 and 64.
-* `min_available_failover` - (Required)minimum number of Available Failover . Value must be in between 0 and 64.
-* `failed_flag` - (Optional) failed flag. Default is false.
+* `num_return` - (Required) Minimum number of value object to return. Value must be in between 0 and 64.
+* `min_available_failover` - (Required) Minimum number of Available Failover. Value must be in between 0 and 64.
+* `failed_flag` - (Optional) Failed flag. Default is false.
 * `disable_flag` - (Optional) Enable or disable pool values. Default is false.
-* `values` - (Required) Object Number of IP/Hosts in a pool values cannot be less than the "Num Return" and "Min Available" values
+* `values` - (Required) Object Number of IP/Hosts in a pool values cannot be less than the "Num Return" and "Min Available" values.
 * `values.value` - (Required) IPv6 address.
-* `values.weight` - (Required) weight number to sort the priorty. Weight must be in between 1 and 1000000.
+* `values.weight` - (Required) Weight number to sort the priorty. Weight must be in between 1 and 1000000.
 * `values.disable_flag` - (Optional) Enable or disable pool values. Default is false.
 * `values.checkid` - (Optional) Sonar check id is required when you want to apply the ITO feature on a pool.
 * `values.policy` - (Required) "followsonar" for Follow sonar. "alwaysoff" for Always off. "alwayson" for Always on. "offonfailure" for Off on Failure.
