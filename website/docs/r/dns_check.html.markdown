@@ -23,7 +23,7 @@ resource "constellix_dns_check" "first" {
 ```
 
 ## Argument Reference ##
-* `name` - (Required) name of the resource. Name should be unique.
+* `name` - (Required) Name of the resource. Name should be unique.
 * `fqdn` - (Required) A website address. It can be set only once
 * `resolver` - (Required) A website address. It can be set only once
 * `check_sites` - (Required) Site ids to check.
