@@ -43,7 +43,9 @@ resource "constellix_domain" "domain1" {
 * `soa.negcache` - (Optional) The amount of time a record not found is cached. Recommended values can vary, between 180 and 172800 (3 min – 2 days). 
 
 ## Attribute Reference ##
-* `soa.serial` - (Optional) The starting serial number for the version of the zone. If the SOA record is applied to a domain that is already created (and thus already has a starting serial number), the existing serial number will be incremented by one. e.g 2015010196
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the domain resource.
+* `soa.serial` - The starting serial number for the version of the zone. If the SOA record is applied to a domain that is already created (and thus already has a starting serial number), the existing serial number will be incremented by one. e.g 2015010196
 
 ## Importing ##
 

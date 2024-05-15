@@ -40,7 +40,8 @@ resource "constellix_http_check" "first" {
 * `expected_status_code` - (Optional) Expected HTTP status code for this check.
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of HTTP check resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of HTTP check resource.
 
 ## Importing ##
 

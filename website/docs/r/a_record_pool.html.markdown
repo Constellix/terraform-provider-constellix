@@ -46,7 +46,8 @@ resource "constellix_a_record_pool" "firstrecord" {
 * `note` - (Optional) Description.
 
 ## Attributes Reference
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the A record pool resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the A record pool resource.
 
 ## Importing ##
 

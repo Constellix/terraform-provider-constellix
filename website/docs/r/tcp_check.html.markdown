@@ -36,7 +36,8 @@ resource "constellix_tcp_check" "first" {
 * `string_to_receive` - (Optional) String which should be received as a result of TCP check.
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of TCP check resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of TCP check resource.
 
 ## Importing ##
 

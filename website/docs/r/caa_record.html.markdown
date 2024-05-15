@@ -68,7 +68,8 @@ All records will have the default issuer critical value of 0, which means they a
 * `type` - (Optional) Record type CAA
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of caa resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of caa resource.
 
 ## Importing ##
 

@@ -26,7 +26,8 @@ resource "constellix_contact_lists" "contactlist1" {
 * `email_addresses` - (Required) List of email addresses
 
 ## Attribute Reference ##
-No attributes are exported
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the Contact List resource.
 
 ## Importing ##
 

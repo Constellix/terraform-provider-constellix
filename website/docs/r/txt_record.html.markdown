@@ -42,7 +42,8 @@ resource "constellix_txt_record" "txtrecord1" {
 * `type` - (Optional) Record type TXT
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of txt resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of txt resource.
 
 ## Importing ##
 

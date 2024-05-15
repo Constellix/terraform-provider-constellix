@@ -48,7 +48,8 @@ resource "constellix_hinfo_record" "hinfo1" {
 * `type` - (Optional) Record type HINFO
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of hinfo resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of hinfo resource.
 
 ## Importing ##
 

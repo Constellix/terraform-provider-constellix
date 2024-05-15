@@ -34,7 +34,8 @@ resource "constellix_dns_check" "first" {
 * `expected_response` - (Optional) Ip Address where DNS provided in the FQDN should resolved to in ideal conditions.
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of DNS check resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of DNS check resource.
 
 
 ## Importing ##

@@ -33,7 +33,8 @@ resource "constellix_geo_proximity" "firstgeoproximity" {
 * `city` - (Optional)City code. Default is null.
 
 ## Attributes Reference
-No attributes are exported.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the Geo Proximity resource.
 
 ## Importing ##
 

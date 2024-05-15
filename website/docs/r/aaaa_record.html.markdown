@@ -94,7 +94,8 @@ resource "constellix_aaaa_record" "firstrecord" {
 * `record_failover_disable_flag` - (Required for failover) enable or disable the recordFailover object. Default is false (Active). Atleast one recordFailover object should be false.
 
 ## Attributes Reference
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the AAAA resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the AAAA resource.
 
 ## Importing ##
 

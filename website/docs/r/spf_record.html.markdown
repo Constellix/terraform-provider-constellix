@@ -45,7 +45,8 @@ resource "constellix_spf_record" "spf1" {
 * `roundrobin.disable_flag` - (Optional) enable or disable the roundrobin object. Default is false. Atleast one roundrobin object should be false.
 
 ## Attributes Reference
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the SPF resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the SPF resource.
 
 ## Importing ##
 
