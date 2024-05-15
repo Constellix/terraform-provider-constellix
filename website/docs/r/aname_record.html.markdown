@@ -79,7 +79,8 @@ resource "constellix_aname_record" "aname_record1" {
 * `record_failover_disable_flag` - (Optional) Enable or Disable the recordfailover object. Default is false. Atleast one recordfailover object should be false.
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of aname resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of aname resource.
 
 ## Importing ##
 

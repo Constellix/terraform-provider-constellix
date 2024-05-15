@@ -37,7 +37,8 @@ resource "constellix_geo_filter" "ipfilter1" {
 * `filter_rules_limit` - (Optional) Default is 100. For more than 100 rules, parameter should be set explicitly for ADD and Update API calls. Value should be in mulitple of 100 like 200, 300 ...upto the quota limit assigned to the account. Check quota details for IP Filter Rule Limit.
 
 ## Attributes Reference
-No attributes are exported.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the Geo Filter.
 
 ## Importing ##
 

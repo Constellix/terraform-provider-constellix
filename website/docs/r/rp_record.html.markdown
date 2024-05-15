@@ -51,7 +51,8 @@ resource "constellix_rp_record" "rp1" {
 * `type` - (Optional) Record type RP
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of rp resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of rp resource.
 
 ## Importing ##
 

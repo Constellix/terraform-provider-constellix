@@ -49,7 +49,8 @@ resource "constellix_srv_record" "srvrecord1" {
 * `type` - (Optional) Record type SRV
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of srv resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of srv resource.
 
 ## Importing ##
 

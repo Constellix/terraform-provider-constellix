@@ -46,7 +46,8 @@ resource "constellix_cname_record_pool" "firstrecord" {
 * `note` - (Optional) Description.
 
 ## Attributes Reference
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the cname record pool resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the cname record pool resource.
 
 ## Importing ##
 

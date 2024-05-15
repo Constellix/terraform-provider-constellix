@@ -45,7 +45,8 @@ resource "constellix_ns_record" "firstrecord" {
 * `roundrobin.disable_flag` - (Required) disable flag. Default is false
 
 ## Attributes Reference
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of the NS resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of the NS resource.
 
 ## Importing ##
 

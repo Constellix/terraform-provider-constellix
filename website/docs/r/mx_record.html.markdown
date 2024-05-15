@@ -48,7 +48,8 @@ resource "constellix_mx_record" "mx1" {
 * `type` - (Optional) Record type MX
 
 ## Attribute Reference ##
-The only attribute that this resource exports is the `id`, which is set to the constellix calculated id of mx resource.
+This resource exports the following attributes:
+* `id` - The constellix calculated id of mx resource.
 
 ## Importing ##
 
