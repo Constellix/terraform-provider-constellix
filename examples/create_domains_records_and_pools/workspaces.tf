@@ -103,7 +103,7 @@ locals {
             fqdn         = "google.com"
           },
           {
-            value        = "malavear.com"
+            value        = "google.com"
             weight       = 20
             policy       = "followsonar"
             disable_flag = false
