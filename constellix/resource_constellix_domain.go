@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/Constellix/constellix-go-client/models"
@@ -277,21 +278,36 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 
 	domainAttr.Soa = soaAttr
 
+	fmt.Printf(`{"place":"saving-domain", "value":"%s"}\n`, domainAttr.Name)
+	var domainID string
 	resp, err := constellixConnect.Save(domainAttr, "v1/domains")
-
 	if err != nil {
-		return err
+		if resp != nil && resp.StatusCode == 400 {
+			parts := strings.Split(err.Error(), "already exists, Domain Id:")
+			if len(parts) == 2 {
+				domainID = strings.TrimSpace(parts[1])
+				fmt.Printf(`{"place":"found-existing-domain", "value":"%s"}\n`, domainID)
+			}
+		}
+	} else {
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		bodyString := string(bodyBytes)
+		var data map[string]interface{}
+		err = json.Unmarshal([]byte(bodyString[1:len(bodyString)-1]), &data)
+		if err != nil {
+			return err
+		}
+		domainID = fmt.Sprintf("%.0f", data["id"])
+		fmt.Printf(`{"place":"created-new-domain", "value":"%s"}\n`, domainID)
 	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
+	if domainID != "" {
+		d.SetId(domainID)
+		return resourceConstellixDNSRead(d, m)
 	}
-	bodyString := string(bodyBytes)
-	var data map[string]interface{}
-	json.Unmarshal([]byte(bodyString[1:len(bodyString)-1]), &data)
-
-	d.SetId(fmt.Sprintf("%.0f", data["id"]))
-	return resourceConstellixDNSRead(d, m)
+	return err
 }
 
 func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
