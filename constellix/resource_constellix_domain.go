@@ -3,7 +3,7 @@ package constellix
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"log"
 	"strconv"
 	"strings"
@@ -152,7 +152,7 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 		}
 		return nil, err
 	}
-	bodyBytes, err := io.ReadAll(resp.Body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +303,7 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 			}
 		}
 	} else {
-		bodyBytes, err := io.ReadAll(resp.Body)
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
@@ -349,7 +349,7 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 		}
 		return err
 	}
-	bodyBytes, err := io.ReadAll(resp.Body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}

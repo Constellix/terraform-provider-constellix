@@ -3,7 +3,7 @@ package constellix
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -223,7 +223,7 @@ func testAccCheckConstellixDomainExists(domain *DomainAttributes, resourceName s
 }
 
 func domainFromResponse(resp *http.Response) (*DomainAttributes, error) {
-	bodyBytes, err := io.ReadAll(resp.Body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
