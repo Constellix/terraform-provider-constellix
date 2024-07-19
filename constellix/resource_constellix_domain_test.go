@@ -3,63 +3,145 @@ package constellix
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
 	"github.com/Constellix/constellix-go-client/client"
-	"github.com/Constellix/constellix-go-client/models"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-func TestAccDomain_Basic(t *testing.T) {
-	var domain models.DomainAttributes
+func TestAccDomainCreation(t *testing.T) {
+	testName1 := "terraform-domain-create-test-1"
+	domainName1 := testName1 + ".test"
+	resourceName1 := "constellix_domain." + testName1
+
+	testName2 := "terraform-domain-create-test-2"
+	domainName2 := testName2 + ".test"
+	resourceName2 := "constellix_domain." + testName2
+
+	var domain1, domain2 DomainAttributes
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckConstellixDomainDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckConstellixDomainConfig_basic("checkashu.com"),
+				Config: testAccCheckConstellixDomainConfig(
+					testName1,
+					domainName1,
+					"note-1",
+					false,
+				),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckConstellixDomainExists("constellix_domain.domain1", &domain),
-					testAccCheckConstellixDomainAttributes("checkashu.com", &domain),
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain1, resourceName1),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain1, domainName1, "note-1", false),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName1, "name", domainName1),
+					resource.TestCheckResourceAttr(resourceName1, "note", "note-1"),
+					resource.TestCheckResourceAttr(resourceName1, "disabled", "false"),
+				),
+			},
+			{
+				Config: testAccCheckConstellixDomainConfig(
+					testName2,
+					domainName2,
+					"note-2",
+					true,
+				),
+				Check: resource.ComposeTestCheckFunc(
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain2, resourceName2),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain2, domainName2, "note-2", true),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName2, "name", domainName2),
+					resource.TestCheckResourceAttr(resourceName2, "note", "note-2"),
+					resource.TestCheckResourceAttr(resourceName2, "disabled", "true"),
 				),
 			},
 		},
 	})
 }
 
-func TestAccConstellixDomain_Update(t *testing.T) {
-	var domain models.DomainAttributes
+func TestAccConstellixDomainUpdate(t *testing.T) {
+	testName := "terraform-domain-update-test"
+	domainName := testName + ".test"
+	resourceName := "constellix_domain." + testName
+	initialConfig := testAccCheckConstellixDomainConfig(
+		testName,
+		domainName,
+		"note-1",
+		false,
+	)
+	updatedConfig1 := testAccCheckConstellixDomainConfig(
+		testName,
+		domainName,
+		"note-2",
+		true,
+	)
+	updatedConfig2 := testAccCheckConstellixDomainConfig(
+		testName,
+		domainName,
+		"note-3",
+		false,
+	)
 
+	var domain1, domain2, domain3 DomainAttributes
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckConstellixDomainDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckConstellixDomainConfig_basic("shushu01.com"),
+				Config: initialConfig,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckConstellixDomainExists("constellix_domain.domain1", &domain),
-					testAccCheckConstellixDomainAttributes("shushu01.com", &domain),
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain1, resourceName),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain1, domainName, "note-1", false),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName, "name", domainName),
+					resource.TestCheckResourceAttr(resourceName, "note", "note-1"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
 				),
 			},
 			{
-				Config: testAccCheckConstellixDomainConfig_basic("ashu70.com"),
+				Config: updatedConfig1,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckConstellixDomainExists("constellix_domain.domain1", &domain),
-					testAccCheckConstellixDomainAttributes("ashu70.com", &domain),
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain2, resourceName),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain2, domainName, "note-2", true),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName, "name", domainName),
+					resource.TestCheckResourceAttr(resourceName, "note", "note-2"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "true"),
+				),
+			},
+			{
+				Config: updatedConfig2,
+				Check: resource.ComposeTestCheckFunc(
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain3, resourceName),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain3, domainName, "note-3", false),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName, "name", domainName),
+					resource.TestCheckResourceAttr(resourceName, "note", "note-3"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckConstellixDomainConfig_basic(name string) string {
+func testAccCheckConstellixDomainConfig(testName, domainName string, note string, disabled bool) string {
 	return fmt.Sprintf(`
-	resource "constellix_domain" "domain1" {
+	resource "constellix_domain" "%s" {
 		name = "%s"
 		soa = {
 			email = "dns.dnsmadeeasy.com."
@@ -70,30 +152,31 @@ func testAccCheckConstellixDomainConfig_basic(name string) string {
 			expire = 1209
 			negcache = 8000
 		}
-		note = "hello"
+		note = "%s"
+		disabled = "%t"
 	}
-	`, name)
+	`, testName, domainName, note, disabled)
 }
 
-func testAccCheckConstellixDomainExists(name string, domain *models.DomainAttributes) resource.TestCheckFunc {
+func testAccCheckConstellixDomainExists(domain *DomainAttributes, resourceName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[name]
+		rs, ok := s.RootModule().Resources[resourceName]
 
 		if !ok {
-			return fmt.Errorf("Domain %s not found", name)
+			return fmt.Errorf("domain %s not found", resourceName)
 		}
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No domain id was set")
+			return fmt.Errorf("no domain id was set")
 		}
 
-		client := testAccProvider.Meta().(*client.Client)
+		cl := testAccProvider.Meta().(*client.Client)
 
-		resp, err := client.GetbyId("v1/domains/" + rs.Primary.ID)
+		resp, err := cl.GetbyId("v1/domains/" + rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
-		tp, _ := domainfromcontainer(resp)
+		tp, _ := domainFromResponse(resp)
 
 		*domain = *tp
 		return nil
@@ -101,50 +184,57 @@ func testAccCheckConstellixDomainExists(name string, domain *models.DomainAttrib
 	}
 }
 
-func domainfromcontainer(resp *http.Response) (*models.DomainAttributes, error) {
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+func domainFromResponse(resp *http.Response) (*DomainAttributes, error) {
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	bodyString := string(bodyBytes)
 	var data map[string]interface{}
-	json.Unmarshal([]byte(bodyString), &data)
-	domain := models.DomainAttributes{}
+	err = json.Unmarshal([]byte(bodyString), &data)
+	if err != nil {
+		return nil, err
+	}
+	domain := DomainAttributes{}
 
+	// FIXME avoid using converters (like toStringList) both in production and test code.
+	// TODO Revamp codebase to use correct data model, allowing direct unmarshalling instead of manual mapping of fields.
 	nameList := toStringList(data["name"])
 	domain.Name = nameList
 	domain.Note = data["note"].(string)
+	domain.Disabled = data["disabled"].(bool)
 
 	return &domain, nil
 
 }
 
 func testAccCheckConstellixDomainDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*client.Client)
+	cl := testAccProvider.Meta().(*client.Client)
 
 	for _, rs := range s.RootModule().Resources {
 
 		if rs.Type == "constellix_domain" {
-			_, err := client.GetbyId("v1/domains/" + rs.Primary.ID)
+			_, err := cl.GetbyId("v1/domains/" + rs.Primary.ID)
 			if err == nil {
-				return fmt.Errorf("Domain is still exists")
+				return fmt.Errorf("domain is still exists, id: %s", rs.Primary.ID)
 			}
 		} else {
 			continue
 		}
-
 	}
 	return nil
 }
 
-func testAccCheckConstellixDomainAttributes(name string, domain *models.DomainAttributes) resource.TestCheckFunc {
+func testAccCheckConstellixDomainAttributes(domain *DomainAttributes, expectedName, expectedNote string, expectedDisabled bool) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if name != domain.Name[0] {
-			return fmt.Errorf("Bad domain name %s", domain.Name)
+		if expectedName != domain.Name[0] {
+			return fmt.Errorf("bad domain name %s", domain.Name)
 		}
-		if "hello" != domain.Note {
-			return fmt.Errorf("Bad domain nameservergroup %s", domain.Note)
+		if expectedNote != domain.Note {
+			return fmt.Errorf("bad domain note %s", domain.Note)
+		}
+		if expectedDisabled != domain.Disabled {
+			return fmt.Errorf("%s bad domain's disabled value %t", domain.Note, domain.Disabled)
 		}
 		return nil
 	}

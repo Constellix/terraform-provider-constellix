@@ -3,7 +3,7 @@ package constellix
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"strconv"
 	"strings"
@@ -32,6 +32,12 @@ func resourceConstellixDomain() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
+			},
+
+			"disabled": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
 			},
 
 			"has_gtd_regions": &schema.Schema{
@@ -146,7 +152,7 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 		}
 		return nil, err
 	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +183,9 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	d.Set("name", stripQuotes(obj.S("name").String()))
 	d.Set("soa", soaset)
 
+	if disabled, err := strconv.ParseBool(stripQuotes(obj.S("disabled").String())); err == nil {
+		d.Set("disabled", disabled)
+	}
 	if hasGeoIP, err := strconv.ParseBool(stripQuotes(obj.S("hasGeoIP").String())); err == nil {
 		d.Set("has_geoip", hasGeoIP)
 	}
@@ -213,11 +222,15 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 
 	constellixConnect := m.(*client.Client)
 
-	domainAttr := models.DomainAttributes{}
+	domainAttr := DomainAttributes{}
 
 	if name, ok := d.GetOk("name"); ok {
 		nameList := toStringList(name)
 		domainAttr.Name = nameList
+	}
+
+	if disabled, ok := d.GetOk("disabled"); ok {
+		domainAttr.Disabled = disabled.(bool)
 	}
 
 	if hasgtdregions, ok := d.GetOk("has_gtd_regions"); ok {
@@ -278,7 +291,9 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 
 	domainAttr.Soa = soaAttr
 
-	fmt.Printf(`{"place":"saving-domain", "value":"%s"}\n`, domainAttr.Name)
+	jsonLogMsg := fmt.Sprintf(`{"step":"creating-new-domain", "name":"%s"}`, domainAttr.Name)
+	log.Println(jsonLogMsg)
+
 	var domainID string
 	resp, err := constellixConnect.Save(domainAttr, "v1/domains")
 	if err != nil {
@@ -286,11 +301,15 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 			parts := strings.Split(err.Error(), "already exists, Domain Id:")
 			if len(parts) == 2 {
 				domainID = strings.TrimSpace(parts[1])
-				fmt.Printf(`{"place":"found-existing-domain", "value":"%s"}\n`, domainID)
+				jsonLogMsg = fmt.Sprintf(
+					`{"step":"creating-new-domain:already-exists", "name":"%s", "id": "%s"}`,
+					domainAttr.Name, domainID,
+				)
+				log.Println(jsonLogMsg)
 			}
 		}
 	} else {
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
@@ -301,7 +320,22 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 			return err
 		}
 		domainID = fmt.Sprintf("%.0f", data["id"])
-		fmt.Printf(`{"place":"created-new-domain", "value":"%s"}\n`, domainID)
+
+		jsonLogMsg = fmt.Sprintf(`{"step":"created-new-domain", "name":"%s", "id": "%s"}`,
+			domainAttr.Name, domainID,
+		)
+		log.Println(jsonLogMsg)
+		if disabled, ok := toBoolValue(d, "disabled"); ok {
+			jsonLogMsg = fmt.Sprintf(
+				`{"step":"created-new-domain:set-disabled-attribute", "name":"%s", "id": "%s", "disabled":"%t"}`,
+				domainAttr.Name, domainID, disabled,
+			)
+			log.Println(jsonLogMsg)
+			err = setDisableAttribute(constellixConnect, domainID, disabled)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	if domainID != "" {
 		d.SetId(domainID)
@@ -315,13 +349,13 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	dn := d.Id()
 	resp, err := constellixclient.GetbyId("v1/domains/" + dn)
 	if err != nil {
-		if resp.StatusCode == 404 {
+		if resp != nil && resp.StatusCode == 404 {
 			d.SetId("")
 			return nil
 		}
 		return err
 	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
@@ -351,6 +385,9 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("name", stripQuotes(obj.S("name").String()))
 	d.Set("soa", soaset)
 
+	if disabled, err := strconv.ParseBool(stripQuotes(obj.S("disabled").String())); err == nil {
+		d.Set("disabled", disabled)
+	}
 	if hasGeoIP, err := strconv.ParseBool(stripQuotes(obj.S("hasGeoIP").String())); err == nil {
 		d.Set("has_geoip", hasGeoIP)
 	}
@@ -385,7 +422,12 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 	constellixClient := m.(*client.Client)
 	dn := d.Id()
 
-	domainAttr := models.DomainAttributes{}
+	domainAttr := DomainAttributes{}
+
+	if disabled, ok := d.GetOk("disabled"); ok {
+		domainAttr.Disabled = disabled.(bool)
+	}
+
 	if hasGTDRegion, ok := d.GetOk("has_gtd_regions"); ok {
 		domainAttr.HasGtdRegions = hasGTDRegion.(bool)
 	}
@@ -449,11 +491,46 @@ func resourceConstellixDNSUpdate(d *schema.ResourceData, m interface{}) error {
 
 		domainAttr.Soa = soaAttr
 	}
+	jsonLogMsg := fmt.Sprintf(`{"step":"updating-domain", "id": "%s"}`, dn)
+	log.Println(jsonLogMsg)
 	_, err := constellixClient.UpdatebyID(domainAttr, "v1/domains/"+dn)
 	if err != nil {
 		return err
 	}
+	if d.HasChange("disabled") {
+		if disabled, ok := toBoolValue(d, "disabled"); ok {
+			jsonLogMsg = fmt.Sprintf(
+				`{"step":"updating-domain:set-disabled-attribute", "id": "%s", "disabled":"%t"}`,
+				dn, disabled,
+			)
+			log.Println(jsonLogMsg)
+			err = setDisableAttribute(constellixClient, dn, disabled)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return resourceConstellixDNSRead(d, m)
+}
+
+func toBoolValue(d *schema.ResourceData, key string) (bool, bool) {
+	if val, ok := d.GetOk(key); ok {
+		if b, ok := val.(bool); ok {
+			return b, ok
+		}
+	}
+	return false, true
+}
+
+func setDisableAttribute(constellixClient *client.Client, domainID string, disabled bool) error {
+	disableDomainAttr := DomainAttributesV4{
+		Enabled: !disabled,
+	}
+	_, err := constellixClient.UpdatebyID(disableDomainAttr, "v4/domains/"+domainID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func resourceConstellixDNSDelete(d *schema.ResourceData, m interface{}) error {
