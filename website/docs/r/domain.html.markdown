@@ -27,6 +27,7 @@ resource "constellix_domain" "domain1" {
 ## Argument Reference ##
 
 * `name` - (Required) Name of the domain.
+* `disabled` - (Optional) Indicates if the domain is disabled. The Default value is `false`.
 * `has_gtd_regions` - (Optional) GTD Region status of the domain. The Default value is `false`.
 * `has_geoip` - (Optional) GTD Region status of the domain. The Default value is `false`.
 * `vanity_nameserver` - (Optional) vanity nameserver of domain.
