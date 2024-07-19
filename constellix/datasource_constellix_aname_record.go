@@ -35,6 +35,38 @@ func datasourceConstellixAnamerecord() *schema.Resource {
 				Computed: true,
 			},
 
+			"geo_location": &schema.Schema{
+				Type: schema.TypeMap,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"geo_ip_user_region": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
+						},
+
+						"drop": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+
+						"geo_ip_proximity": &schema.Schema{
+							Type:     schema.TypeInt,
+							Optional: true,
+							Computed: true,
+						},
+						"geo_ip_failover": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+					},
+				},
+				Optional: true,
+				Computed: true,
+			},
+
 			"record_option": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -42,6 +74,12 @@ func datasourceConstellixAnamerecord() *schema.Resource {
 			},
 
 			"noanswer": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+
+			"skip_lookup": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -101,11 +139,6 @@ func datasourceConstellixAnamerecord() *schema.Resource {
 							Optional: true,
 							Computed: true,
 						},
-						"checkidrcdf": &schema.Schema{
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
 						"sort_order": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -160,6 +193,28 @@ func datasourceConstellixAnamerecordRead(d *schema.ResourceData, m interface{}) 
 		if name == tp["name"].(string) {
 			flag = true
 
+			geoloc1 := tp["geolocation"]
+
+			geoLocMap := make(map[string]interface{})
+			if geoloc1 != nil {
+				geoloc := geoloc1.(map[string]interface{})
+				if geoloc["geoipFilter"] != nil {
+					geoLocMap["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
+				}
+				if geoloc["drop"] != nil {
+					geoLocMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+				}
+				if geoloc["geoipFailover"] != nil {
+					geoLocMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+				}
+				if geoloc["geoipProximity"] != nil {
+					geoLocMap["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
+				}
+				d.Set("geo_location", geoLocMap)
+			} else {
+				d.Set("geo_location", geoLocMap)
+			}
+
 			rrlist := make([]interface{}, 0, 1)
 			if tp["roundRobin"] != nil {
 				recroundrobin := tp["roundRobin"].([]interface{})
@@ -174,21 +229,23 @@ func datasourceConstellixAnamerecordRead(d *schema.ResourceData, m interface{}) 
 			}
 
 			rcdf := tp["recordFailover"]
-			rcdf1 := rcdf.(map[string]interface{})
-			rcdfset := make(map[string]interface{})
-			rcdfset["record_failover_failover_type"] = fmt.Sprintf("%v", rcdf1["failoverType"])
-			rcdfset["record_failover_disable_flag"] = fmt.Sprintf("%v", rcdf1["disabled"])
-
-			rcdfvalues := rcdf1["values"].([]interface{})
-
 			rcdflist := make([]interface{}, 0, 1)
-			for _, valrcdf := range rcdfvalues {
-				map1 := make(map[string]interface{})
-				val1 := valrcdf.(map[string]interface{})
-				map1["value"] = fmt.Sprintf("%v", val1["value"])
-				map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
-				map1["disable_flag"] = fmt.Sprintf("%v", val1["disabled"])
-				rcdflist = append(rcdflist, map1)
+			if rcdf != nil {
+				rcdf1 := rcdf.(map[string]interface{})
+
+				d.Set("record_failover_failover_type", fmt.Sprintf("%v", rcdf1["failoverType"]))
+				d.Set("record_failover_disable_flag", fmt.Sprintf("%v", rcdf1["disabled"]))
+
+				rcdfvalues := rcdf1["values"].([]interface{})
+
+				for _, valrcdf := range rcdfvalues {
+					map1 := make(map[string]interface{})
+					val1 := valrcdf.(map[string]interface{})
+					map1["value"] = fmt.Sprintf("%v", val1["value"])
+					map1["sort_order"] = fmt.Sprintf("%v", val1["sortOrder"])
+					map1["disable_flag"] = fmt.Sprintf("%v", val1["disableFlag"])
+					rcdflist = append(rcdflist, map1)
+				}
 			}
 
 			d.SetId(fmt.Sprintf("%v", tp["id"]))
@@ -196,17 +253,16 @@ func datasourceConstellixAnamerecordRead(d *schema.ResourceData, m interface{}) 
 			d.Set("ttl", tp["ttl"])
 			d.Set("record_option", tp["recordOption"])
 			d.Set("noanswer", tp["noAnswer"])
+			d.Set("skip_lookup", tp["skipLookup"])
 			d.Set("note", tp["note"])
 			d.Set("gtd_region", tp["gtdRegion"])
 			d.Set("type", tp["type"])
 			d.Set("contact_ids", tp["contactids"])
 			d.Set("roundrobin", rrlist)
 			d.Set("record_failover_values", rcdflist)
-			d.Set("record_failover_failover_type", rcdfset["record_failover_failover_type"])
-			d.Set("record_failover_disable_flag", rcdfset["record_failover_disable_flag"])
 		}
 	}
-	if flag != true {
+	if !flag {
 		return fmt.Errorf("ANAME record of specified name is not available")
 	}
 	return nil

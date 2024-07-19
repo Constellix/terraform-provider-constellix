@@ -140,8 +140,8 @@ func datasourceConstellixTxtRead(d *schema.ResourceData, m interface{}) error {
 			for _, val := range resrr {
 				tpMap := make(map[string]interface{})
 				inner := val.(map[string]interface{})
-				tpMap["value"] = fmt.Sprintf("%v", inner["value"])
-				tpMap["disable_flag"] = fmt.Sprintf("%v", inner["disableFlag"])
+				tpMap["value"] = stripQuotes(inner["value"].(string)) // removing the quotes added by the server during the GET call
+				tpMap["disable_flag"] = inner["disableFlag"].(bool)
 				mapListRR = append(mapListRR, tpMap)
 			}
 

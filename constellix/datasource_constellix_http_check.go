@@ -50,6 +50,14 @@ func datasourceConstellixHTTPCheck() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+
+			"notification_groups": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
+
 			"interval": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -106,6 +114,11 @@ func datasourceConstellixHTTPCheck() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"notification_report_timeout": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -140,6 +153,7 @@ func datasourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) er
 			d.Set("ip_version", tp["ipVersion"])
 			d.Set("port", tp["port"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("notification_groups", tp["notificationGroups"])
 			d.Set("interval", tp["interval"])
 			d.Set("interval_policy", tp["monitorIntervalPolicy"])
 			d.Set("verification_policy", tp["verificationPolicy"])
@@ -147,6 +161,7 @@ func datasourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) er
 			d.Set("path", tp["path"])
 			d.Set("search_string", tp["searchString"])
 			d.Set("expected_status_code", tp["expectedStatusCode"])
+			d.Set("notification_report_timeout", tp["notificationReportTimeout"])
 		}
 	}
 	if flag != true {

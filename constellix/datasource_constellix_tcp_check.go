@@ -44,6 +44,12 @@ func datasourceConstellixTCPCheck() *schema.Resource {
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
+			"notification_groups": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
 			"interval": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -90,6 +96,11 @@ func datasourceConstellixTCPCheck() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"notification_report_timeout": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -123,11 +134,13 @@ func datasourceConstellixTCPCheckRead(d *schema.ResourceData, m interface{}) err
 			d.Set("ip_version", tp["ipVersion"])
 			d.Set("port", tp["port"])
 			d.Set("check_sites", tp["checkSites"])
+			d.Set("notification_groups", tp["notificationGroups"])
 			d.Set("interval", tp["interval"])
 			d.Set("interval_policy", tp["monitorIntervalPolicy"])
 			d.Set("verification_policy", tp["verificationPolicy"])
 			d.Set("string_to_send", tp["stringToSend"])
 			d.Set("string_to_receive", tp["stringToReceive"])
+			d.Set("notification_report_timeout", tp["notificationReportTimeout"])
 		}
 	}
 	if flag != true {

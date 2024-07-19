@@ -5,6 +5,7 @@ resource "constellix_http_check" "first" {
   port = 443
   protocol_type = "HTTPS"
   check_sites = [1,2]
+  notification_groups = [874, 875, 876]
   fqdn = "test.com"
   path = "root"
   interval = "ONEMINUTE"

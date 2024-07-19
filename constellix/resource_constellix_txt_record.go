@@ -86,7 +86,7 @@ func resourceConstellixTxt() *schema.Resource {
 			},
 
 			"roundrobin": &schema.Schema{
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -96,7 +96,7 @@ func resourceConstellixTxt() *schema.Resource {
 						},
 
 						"disable_flag": &schema.Schema{
-							Type:     schema.TypeString,
+							Type:     schema.TypeBool,
 							Optional: true,
 							Computed: true,
 						},
@@ -137,13 +137,14 @@ func resourceConstellixTxtImport(d *schema.ResourceData, m interface{}) ([]*sche
 	d.Set("parentid", data["parentId"])
 	d.Set("parent", data["parent"])
 	d.Set("source", data["source"])
+
 	resrr := (data["roundRobin"]).([]interface{})
 	mapListRR := make([]interface{}, 0, 1)
 	for _, val := range resrr {
 		tpMap := make(map[string]interface{})
 		inner := val.(map[string]interface{})
-		tpMap["value"] = fmt.Sprintf("%v", inner["value"])
-		tpMap["disableFlag"] = fmt.Sprintf("%v", inner["disableFlag"])
+		tpMap["value"] = stripQuotes(inner["value"].(string)) // removing the quotes added by the server during the GET call
+		tpMap["disable_flag"] = inner["disableFlag"].(bool)
 		mapListRR = append(mapListRR, tpMap)
 	}
 
@@ -196,7 +197,7 @@ func resourceConstellixTxtCreate(d *schema.ResourceData, m interface{}) error {
 
 	if rr, ok := d.GetOk("roundrobin"); ok {
 		mapListRR := make([]interface{}, 0, 1)
-		tp := rr.(*schema.Set).List()
+		tp := rr.([]interface{})
 		for _, val := range tp {
 			tpMap := make(map[string]interface{})
 			inner := val.(map[string]interface{})
@@ -271,7 +272,7 @@ func resourceConstellixTxtUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 	if rr, ok := d.GetOk("roundrobin"); ok {
 		mapListRR := make([]interface{}, 0, 1)
-		tp := rr.(*schema.Set).List()
+		tp := rr.([]interface{})
 		for _, val := range tp {
 			tpMap := make(map[string]interface{})
 			inner := val.(map[string]interface{})
@@ -330,8 +331,10 @@ func resourceConstellixTxtRead(d *schema.ResourceData, m interface{}) error {
 	for _, val := range resrr {
 		tpMap := make(map[string]interface{})
 		inner := val.(map[string]interface{})
-		tpMap["value"] = fmt.Sprintf("%v", inner["value"])
-		tpMap["disableFlag"] = fmt.Sprintf("%v", inner["disableFlag"])
+		value := stripQuotes(inner["value"].(string))
+		value = strings.ReplaceAll(value, "\" \"", "")
+		tpMap["value"] = value
+		tpMap["disable_flag"] = inner["disableFlag"].(bool)
 		mapListRR = append(mapListRR, tpMap)
 	}
 

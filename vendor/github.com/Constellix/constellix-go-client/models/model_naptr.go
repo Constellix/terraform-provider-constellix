@@ -3,7 +3,7 @@ package models
 type NAPTRAttributes struct {
 	Name       string        `json:"name,omitempty"`
 	Ttl        int           `json:"ttl"`
-	NoAnswer   bool          `json:"noAnswer,omitempty"`
+	NoAnswer   bool          `json:"noAnswer"`
 	RoundRobin []interface{} `json:"roundRobin"`
 	Note       string        `json:"note,omitempty"`
 	GtdRegion  int           `json:"gtdRegion,omitempty"`

@@ -9,7 +9,7 @@ type RoundR struct {
 type MXAttributes struct {
 	Name       string        `json:"name,omitempty"`
 	TTL        int           `json:"ttl"`
-	NoAnswer   bool          `json:"noanswer,omitempty"`
+	NoAnswer   bool          `json:"noanswer"`
 	Note       string        `json:"note,omitempty"`
 	GtdRegion  int           `json:"gtdregion,omitempty"`
 	Type       string        `json:"type,omitempty"`

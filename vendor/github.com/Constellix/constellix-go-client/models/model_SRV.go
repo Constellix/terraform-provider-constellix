@@ -3,7 +3,7 @@ package models
 type SRVAttributes struct {
 	Name       string        `json:"name,omitempty"`
 	TTL        int           `json:"ttl"`
-	NoAnswer   bool          `json:"noAnswer,omitempty"`
+	NoAnswer   bool          `json:"noAnswer"`
 	Note       string        `json:"note,omitempty"`
 	GtdRegion  int           `json:"gtdRegion,omitempty"`
 	Type       string        `json:"type,omitempty"`
@@ -15,5 +15,5 @@ type RoundRobinSRV struct {
 	Port        int    `json:"port,omitempty"`
 	Priority    int    `json:"priority,omitempty"`
 	Weight      int    `json:"weight,omitempty"`
-	DisableFlag bool   `json:"disableflag,omitempty"`
+	DisableFlag bool   `json:"disableflag"`
 }

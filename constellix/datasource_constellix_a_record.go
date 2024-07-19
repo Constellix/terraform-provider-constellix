@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/Constellix/constellix-go-client/client"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -221,19 +222,27 @@ func datasourceConstellixARecordRead(d *schema.ResourceData, m interface{}) erro
 		if tp["name"].(string) == name1 {
 			flag = true
 
-			geoloc1 := tp["geo_location"]
-			geoset := make(map[string]interface{})
+			geoloc1 := tp["geolocation"]
+			log.Println("GEOLOC VALUE INSIDE READ :", geoloc1)
+
+			geoLocMap := make(map[string]interface{})
 			if geoloc1 != nil {
 				geoloc := geoloc1.(map[string]interface{})
 				if geoloc["geoipFilter"] != nil {
-					geoset["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
-					geoset["drop"] = fmt.Sprintf("%v", geoloc["drop"])
-					geoset["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
-				} else {
-					geoset["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
+					geoLocMap["geo_ip_user_region"] = fmt.Sprintf("%v", geoloc["geoipFilter"])
 				}
+				if geoloc["drop"] != nil {
+					geoLocMap["drop"] = fmt.Sprintf("%v", geoloc["drop"])
+				}
+				if geoloc["geoipFailover"] != nil {
+					geoLocMap["geo_ip_failover"] = fmt.Sprintf("%v", geoloc["geoipFailover"])
+				}
+				if geoloc["geoipProximity"] != nil {
+					geoLocMap["geo_ip_proximity"] = fmt.Sprintf("%v", geoloc["geoipProximity"])
+				}
+				d.Set("geo_location", geoLocMap)
 			} else {
-				geoset = nil
+				d.Set("geo_location", geoLocMap)
 			}
 			arecroundrobin := tp["roundRobin"].([]interface{})
 			rrlist := make([]interface{}, 0, 1)
@@ -261,12 +270,11 @@ func datasourceConstellixARecordRead(d *schema.ResourceData, m interface{}) erro
 			}
 
 			rcdf := tp["recordFailover"]
-			rcdfset := make(map[string]interface{})
 			rcdflist := make([]interface{}, 0, 1)
 			if rcdf != nil {
 				rcdf1 := rcdf.(map[string]interface{})
-				rcdfset["record_failover_failover_type"] = fmt.Sprintf("%v", rcdf1["failoverType"])
-				rcdfset["record_failover_disable_flag"] = fmt.Sprintf("%v", rcdf1["disabled"])
+				d.Set("record_failover_failover_type", fmt.Sprintf("%v", rcdf1["failoverType"]))
+				d.Set("record_failover_disable_flag", fmt.Sprintf("%v", rcdf1["disabled"]))
 
 				rcdfvalues := rcdf1["values"].([]interface{})
 
@@ -283,7 +291,6 @@ func datasourceConstellixARecordRead(d *schema.ResourceData, m interface{}) erro
 			d.SetId(fmt.Sprintf("%v", tp["id"]))
 			d.Set("name", tp["name"])
 			d.Set("ttl", tp["ttl"])
-			d.Set("geo_location", geoset)
 			d.Set("record_option", tp["recordOption"])
 			d.Set("noanswer", tp["noAnswer"])
 			d.Set("note", tp["note"])
@@ -294,8 +301,6 @@ func datasourceConstellixARecordRead(d *schema.ResourceData, m interface{}) erro
 			d.Set("roundrobin", rrlist)
 			d.Set("roundrobin_failover", rrflist)
 			d.Set("record_failover_values", rcdflist)
-			d.Set("record_failover_failover_type", rcdfset["record_failover_failover_type"])
-			d.Set("record_failover_disable_flag", rcdfset["record_failover_disable_flag"])
 		}
 	}
 

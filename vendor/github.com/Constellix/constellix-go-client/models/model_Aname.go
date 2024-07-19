@@ -1,16 +1,15 @@
 package models
 
 type AnameAttributes struct {
-	//Id              int      `json:"id"`
-	//DomainID       string   `json:"domainid"`
 	Name                string            `json:"name,omitempty"`
 	TTL                 int               `json:"ttl"`
 	RecordOption        string            `json:"recordOption,omitempty"`
-	NoAnswer            bool              `json:"noAnswer,omitempty"`
+	NoAnswer            bool              `json:"noAnswer,"`
+	SkipLookup          bool              `json:"skipLookup,"`
 	Note                string            `json:"note,omitempty"`
 	GtdRegion           int               `json:"gtdRegion,omitempty"`
 	Type                string            `json:"type,omitempty"`
-	ContactIDs          []int             `json:"contactids,omitempty"`
+	ContactIDs          []int             `json:"contactIds,omitempty"`
 	RoundRobin          []interface{}     `json:"roundRobin,omitempty"`
 	Pools               []int             `json:"pools,omitempty"`
 	GeoLocation         *GeolocationANAME `json:"geolocation,omitempty"`
@@ -19,9 +18,9 @@ type AnameAttributes struct {
 
 type GeolocationANAME struct {
 	GeoIpUserRegion []int `json:"geoipUserRegion,omitempty"`
-	Drop            bool  `json:"drop,omitempty"`
+	Drop            bool  `json:"drop,"`
 	GeoIpProximity  int   `json:"geoipProximity,omitempty"`
-	GeoIpFailOver   bool  `json:"geoipFailover,omitempty"`
+	GeoIpFailOver   bool  `json:"geoipFailover,"`
 }
 
 type AnameRoundRobin struct {
@@ -32,12 +31,12 @@ type AnameRoundRobin struct {
 type RCDFAname struct {
 	Values            []interface{} `json:"values,omitempty"`
 	FailoverTypeAname int           `json:"failoverType,omitempty"`
-	DisableFlagAname  bool          `json:"disabled,omitempty"`
+	DisableFlagAname  bool          `json:"disabled,"`
 }
 
 type ValuesAname struct {
 	Value         string `json:"value,omitempty"`
 	SortOrderRCDF int    `json:"sortOrder,omitempty"`
-	DisableFlag   bool   `json:"disableFlag,omitempty"`
+	DisableFlag   bool   `json:"disableFlag,"`
 	CheckID       int    `json:"checkid,omitempty"`
 }

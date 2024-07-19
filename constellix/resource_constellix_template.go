@@ -157,7 +157,9 @@ func resourceConstellixTemplateUpdate(d *schema.ResourceData, m interface{}) err
 	if domain, ok := d.GetOk("domain"); ok {
 		templateAttr.Domain = domain.(int)
 	}
-
+	if name, ok := d.GetOk("name"); ok {
+		templateAttr.Name = toStringList(name)
+	}
 	if hasgtdRegion, ok := d.GetOk("has_gtd_regions"); ok {
 		templateAttr.HasGtdRegions = hasgtdRegion.(bool)
 	}

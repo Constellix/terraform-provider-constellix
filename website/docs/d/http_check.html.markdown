@@ -28,6 +28,7 @@ data "constellix_http_check" "check" {
 * `port` - (Optional) Specifies the port number.
 * `protocol_type` - (Optional) Specifies upper layer protocol like HTTP, HTTPs, etc.
 * `check_sites` - (Optional) Site ids to check.
+* `notification_groups` - (Optional) List of group IDs for the notification group of HTTP Check.
 * `interval` - (Optional) Check Interval. Allowed values are `THIRTYSECONDS`, `ONEMINUTE`, `TWOMINUTES`, `THREEMINUTES`, `FOURMINUTES`, `FIVEMINUTES`, `TENMINUTES`, `THIRTYMINUTES`, `HALFDAY` and `DAY`.
 * `interval_policy` - (Optional) Agent Interval Run Policy. It specifies whether you want to run checks from one location or all. Allowed values are `PARALLEL`, `ONCEPERSITE` and `ONCEPERREGION`.
 * `verification_policy` - (Optional) Specifies how the check should be validated. Allowed values are `SIMPLE` and `MAJORITY`. This parameter will only work with the `interval_policy` set to `PARALLEL`.
