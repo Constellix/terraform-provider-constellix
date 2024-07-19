@@ -146,7 +146,7 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	constellixClient := m.(*client.Client)
 	resp, err := constellixClient.GetbyId("v1/domains/" + d.Id())
 	if err != nil {
-		if resp.StatusCode == 404 {
+		if resp != nil && resp.StatusCode == 404 {
 			d.SetId("")
 			return nil, err
 		}
@@ -163,16 +163,10 @@ func resourceConstellixDNSImport(d *schema.ResourceData, m interface{}) ([]*sche
 	}
 
 	soaset := make(map[string]interface{})
-	if value, ok := d.GetOk("soa"); ok {
-		tp := value.(map[string]interface{})
-		if tp["email"] != nil {
-			soaset["email"] = stripQuotes(obj.S("soa", "email").String())
-		}
-	}
-
 	if obj.Exists("soa") {
-		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
 		soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
+		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
+		soaset["email"] = stripQuotes(obj.S("soa", "email").String())
 		soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
 		soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
 		soaset["retry"] = stripQuotes(obj.S("soa", "retry").String())
@@ -366,14 +360,9 @@ func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	soaset := make(map[string]interface{})
-	if value, ok := d.GetOk("soa"); ok {
-		tp := value.(map[string]interface{})
-		if tp["email"] != nil {
-			soaset["email"] = stripQuotes(obj.S("soa", "email").String())
-		}
-	}
 	if obj.Exists("soa") {
 		soaset["primary_nameserver"] = stripQuotes(obj.S("soa", "primaryNameserver").String())
+		soaset["email"] = stripQuotes(obj.S("soa", "email").String())
 		soaset["ttl"] = stripQuotes(obj.S("soa", "ttl").String())
 		soaset["refresh"] = stripQuotes(obj.S("soa", "refresh").String())
 		soaset["expire"] = stripQuotes(obj.S("soa", "expire").String())
