@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-func TestAccDomainCreation(t *testing.T) {
+func TestAccConstellixDomainCreation(t *testing.T) {
 	testName1 := "terraform-domain-create-test-1"
 	domainName1 := testName1 + ".test"
 	resourceName1 := "constellix_domain." + testName1
@@ -139,14 +139,52 @@ func TestAccConstellixDomainUpdate(t *testing.T) {
 	})
 }
 
+func TestAccConstellixDomainImport(t *testing.T) {
+	testName := "terraform-domain-import-test-1"
+	domainName := testName + ".test"
+	resourceName := "constellix_domain." + testName
+
+	var domain DomainAttributes
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckConstellixDomainDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckConstellixDomainConfig(
+					testName,
+					domainName,
+					"note-1",
+					true,
+				),
+				Check: resource.ComposeTestCheckFunc(
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain, resourceName),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain, domainName, "note-1", true),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName, "name", domainName),
+					resource.TestCheckResourceAttr(resourceName, "note", "note-1"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "true"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckConstellixDomainConfig(testName, domainName string, note string, disabled bool) string {
 	return fmt.Sprintf(`
 	resource "constellix_domain" "%s" {
 		name = "%s"
 		soa = {
-			email = "dns.dnsmadeeasy.com."
-			primary_nameserver = "ns41.constellix.com."
 			ttl = 1800
+			primary_nameserver = "ns41.constellix.com."
+			email = "dns.dnsmadeeasy.com."
 			refresh = 48100
 			retry = 7200
 			expire = 1209
@@ -234,7 +272,7 @@ func testAccCheckConstellixDomainAttributes(domain *DomainAttributes, expectedNa
 			return fmt.Errorf("bad domain note %s", domain.Note)
 		}
 		if expectedDisabled != domain.Disabled {
-			return fmt.Errorf("%s bad domain's disabled value %t", domain.Note, domain.Disabled)
+			return fmt.Errorf("bad domain's disabled value %t", domain.Disabled)
 		}
 		return nil
 	}
