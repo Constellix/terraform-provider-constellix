@@ -14,6 +14,7 @@ resource "constellix_domain" "domain1" {
   name = "domain1.com"
   soa = {
     primary_nameserver = "ns41.constellix.com."
+    email              = "dns.constellix.com."
     ttl                = 1800
     refresh            = 48100
     retry              = 7200
