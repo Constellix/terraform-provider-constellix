@@ -75,6 +75,59 @@ func TestAccConstellixDomainCreation(t *testing.T) {
 	})
 }
 
+func TestAccConstellixDomainCreationIdempotency(t *testing.T) {
+	testName := "terraform-domain-create-idempotency-test-1"
+	domainName := testName + ".test"
+	resourceName := "constellix_domain." + testName
+	domainConfig := testAccCheckConstellixDomainConfig(
+		testName,
+		domainName,
+		"note-1",
+		false,
+	)
+
+	var domain DomainAttributes
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckConstellixDomainDestroy,
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					log.Println("should successfully create for a follow up test step to recreate (idempotent) domain creation")
+				},
+				Config: domainConfig,
+				Check: resource.ComposeTestCheckFunc(
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain, resourceName),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain, domainName, "note-1", false),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName, "name", domainName),
+					resource.TestCheckResourceAttr(resourceName, "note", "note-1"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+				),
+			},
+			{
+				PreConfig: func() {
+					log.Println("should be idempotent when reapplying the same domain creation configuration")
+				},
+				Config: domainConfig,
+				Check: resource.ComposeTestCheckFunc(
+					// Load domain from API.
+					testAccCheckConstellixDomainExists(&domain, resourceName),
+					// Check if load values are correct.
+					testAccCheckConstellixDomainAttributes(&domain, domainName, "note-1", false),
+					// Check if the values inside terraform state are correct.
+					resource.TestCheckResourceAttr(resourceName, "name", domainName),
+					resource.TestCheckResourceAttr(resourceName, "note", "note-1"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+				),
+			},
+		},
+	})
+}
+
 func TestAccConstellixDomainCreationFailure(t *testing.T) {
 	testName := "terraform-domain-create-failure-1"
 	invalidDomainName := "terraform_test_invalid_domain_name"
@@ -250,27 +303,32 @@ func testAccCheckConstellixDomainConfig(testName, domainName string, note string
 func testAccCheckConstellixDomainExists(domain *DomainAttributes, resourceName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[resourceName]
-
 		if !ok {
-			return fmt.Errorf("domain %s not found", resourceName)
+			return fmt.Errorf("domain resource %s not found", resourceName)
 		}
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("no domain id was set")
 		}
 
-		cl := testAccProvider.Meta().(*client.Client)
-
-		resp, err := cl.GetbyId("v1/domains/" + rs.Primary.ID)
+		resp, err := loadDomainFromRemote(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
 		tp, _ := domainFromResponse(resp)
-
 		*domain = *tp
 		return nil
 
 	}
+}
+
+func loadDomainFromRemote(domainID string) (*http.Response, error) {
+	cl := testAccProvider.Meta().(*client.Client)
+	resp, err := cl.GetbyId("v1/domains/" + domainID)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func domainFromResponse(resp *http.Response) (*DomainAttributes, error) {
@@ -303,18 +361,14 @@ func testAccCheckConstellixDomainDoesNotExist(resourceName string) resource.Test
 		if ok {
 			return fmt.Errorf("expected domain resource %s to not exist, but it was found in the state", resourceName)
 		}
-
 		return nil
 	}
 }
 
 func testAccCheckConstellixDomainDestroy(s *terraform.State) error {
-	cl := testAccProvider.Meta().(*client.Client)
-
 	for _, rs := range s.RootModule().Resources {
-
 		if rs.Type == "constellix_domain" {
-			_, err := cl.GetbyId("v1/domains/" + rs.Primary.ID)
+			_, err := loadDomainFromRemote(rs.Primary.ID)
 			if err == nil {
 				return fmt.Errorf("domain is still exists, id: %s", rs.Primary.ID)
 			}
