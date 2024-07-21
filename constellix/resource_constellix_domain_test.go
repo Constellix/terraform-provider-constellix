@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"testing"
 
 	"github.com/Constellix/constellix-go-client/client"
@@ -61,6 +62,31 @@ func TestAccConstellixDomainCreation(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName2, "name", domainName2),
 					resource.TestCheckResourceAttr(resourceName2, "note", "note-2"),
 					resource.TestCheckResourceAttr(resourceName2, "disabled", "true"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccConstellixDomainCreationFailure(t *testing.T) {
+	testName := "terraform-domain-create-failure-1"
+	invalidDomainName := "terraform_test_invalid_domain_name"
+	resourceName := "constellix_domain." + testName
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckConstellixDomainDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckConstellixDomainConfig(
+					testName,
+					invalidDomainName,
+					"",
+					false,
+				),
+				ExpectError: regexp.MustCompile(`"terraform_test_invalid_domain_name" is not a valid domain name`),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckConstellixDomainDoesNotExist(resourceName),
 				),
 			},
 		},
@@ -244,6 +270,17 @@ func domainFromResponse(resp *http.Response) (*DomainAttributes, error) {
 
 	return &domain, nil
 
+}
+
+func testAccCheckConstellixDomainDoesNotExist(resourceName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		_, ok := s.RootModule().Resources[resourceName]
+		if ok {
+			return fmt.Errorf("expected domain resource %s to not exist, but it was found in the state", resourceName)
+		}
+
+		return nil
+	}
 }
 
 func testAccCheckConstellixDomainDestroy(s *terraform.State) error {
