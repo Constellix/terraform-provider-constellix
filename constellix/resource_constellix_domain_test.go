@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"regexp"
 	"testing"
@@ -29,6 +30,9 @@ func TestAccConstellixDomainCreation(t *testing.T) {
 		CheckDestroy: testAccCheckConstellixDomainDestroy,
 		Steps: []resource.TestStep{
 			{
+				PreConfig: func() {
+					log.Println("should successfully create a domain with note and disabled (set to false) attributes")
+				},
 				Config: testAccCheckConstellixDomainConfig(
 					testName1,
 					domainName1,
@@ -47,6 +51,9 @@ func TestAccConstellixDomainCreation(t *testing.T) {
 				),
 			},
 			{
+				PreConfig: func() {
+					log.Println("should successfully create a domain with note and disabled (set to true) attributes")
+				},
 				Config: testAccCheckConstellixDomainConfig(
 					testName2,
 					domainName2,
@@ -78,6 +85,9 @@ func TestAccConstellixDomainCreationFailure(t *testing.T) {
 		CheckDestroy: testAccCheckConstellixDomainDestroy,
 		Steps: []resource.TestStep{
 			{
+				PreConfig: func() {
+					log.Println("should error when attempt to create a domain with an invalid name")
+				},
 				Config: testAccCheckConstellixDomainConfig(
 					testName,
 					invalidDomainName,
@@ -123,6 +133,9 @@ func TestAccConstellixDomainUpdate(t *testing.T) {
 		CheckDestroy: testAccCheckConstellixDomainDestroy,
 		Steps: []resource.TestStep{
 			{
+				PreConfig: func() {
+					log.Println("should create a domain for follow up steps testing update operation on a domain")
+				},
 				Config: initialConfig,
 				Check: resource.ComposeTestCheckFunc(
 					// Load domain from API.
@@ -136,6 +149,9 @@ func TestAccConstellixDomainUpdate(t *testing.T) {
 				),
 			},
 			{
+				PreConfig: func() {
+					log.Println("should update values of note and disabled attributes (set to true) of a domain")
+				},
 				Config: updatedConfig1,
 				Check: resource.ComposeTestCheckFunc(
 					// Load domain from API.
@@ -149,6 +165,9 @@ func TestAccConstellixDomainUpdate(t *testing.T) {
 				),
 			},
 			{
+				PreConfig: func() {
+					log.Println("should update values of note and disabled attributes (set to false) of a domain")
+				},
 				Config: updatedConfig2,
 				Check: resource.ComposeTestCheckFunc(
 					// Load domain from API.
@@ -177,6 +196,9 @@ func TestAccConstellixDomainImport(t *testing.T) {
 		CheckDestroy: testAccCheckConstellixDomainDestroy,
 		Steps: []resource.TestStep{
 			{
+				PreConfig: func() {
+					log.Println("should create a domain for follow up steps testing import operation on domain")
+				},
 				Config: testAccCheckConstellixDomainConfig(
 					testName,
 					domainName,
@@ -195,6 +217,9 @@ func TestAccConstellixDomainImport(t *testing.T) {
 				),
 			},
 			{
+				PreConfig: func() {
+					log.Println("should validate import state of a domain")
+				},
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
