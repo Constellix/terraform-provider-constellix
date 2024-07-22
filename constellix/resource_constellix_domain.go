@@ -3,6 +3,7 @@ package constellix
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"strconv"
@@ -303,17 +304,10 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 			}
 		}
 	} else {
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		domainID, err = extractDomainIDFromDomainCreationResponse(resp.Body)
 		if err != nil {
 			return err
 		}
-		bodyString := string(bodyBytes)
-		var data map[string]interface{}
-		err = json.Unmarshal([]byte(bodyString[1:len(bodyString)-1]), &data)
-		if err != nil {
-			return err
-		}
-		domainID = fmt.Sprintf("%.0f", data["id"])
 
 		jsonLogMsg = fmt.Sprintf(`{"step":"created-new-domain", "name":"%s", "id": "%s"}`,
 			domainAttr.Name, domainID,
@@ -336,6 +330,20 @@ func resourceConstellixDNSCreate(d *schema.ResourceData, m interface{}) error {
 		return resourceConstellixDNSRead(d, m)
 	}
 	return err
+}
+
+func extractDomainIDFromDomainCreationResponse(respBody io.ReadCloser) (string, error) {
+	bodyBytes, err := ioutil.ReadAll(respBody)
+	if err != nil {
+		return "", err
+	}
+	bodyString := string(bodyBytes)
+	var data map[string]interface{}
+	err = json.Unmarshal([]byte(bodyString[1:len(bodyString)-1]), &data)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%.0f", data["id"]), err
 }
 
 func resourceConstellixDNSRead(d *schema.ResourceData, m interface{}) error {
