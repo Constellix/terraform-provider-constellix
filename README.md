@@ -66,3 +66,24 @@ If you want to work on the provider, you'll first need [Go](http://www.golang.or
 
 To compile the provider, run `make build`. This will build the provider with sanity checks present in scripts directory and put the provider binary in `$GOPATH/bin` directory.
 
+Release process
+------------------
+
+The release candidates and new stable versions of this provider can be deployed using the following process:
+
+- Calculate new version by incrementing the previous version. If current version is `v0.4.5`, next release candidates
+should be named as `v0.4.6-rc.1, v0.4.6-rc.2, ...` and stable version should be `v0.4.6`.
+
+- Create the tag and push it
+```shell
+git tag v0.4.6
+git push origin v0.4.6
+```
+
+- On creation of the new tag (starting with letter `v`), the [release workflow](.github/workflows/release.yml) will 
+execute as a GitHub Action and would create a `draft` release.
+- Review the `draft` release listed on [releases page](/releases).
+- Add release notes (recommended) and publish the release.
+- Once release is published, it will automatically push changes to terraform registry, which will publish the new version
+on https://registry.terraform.io/providers/Constellix/constellix.
+
