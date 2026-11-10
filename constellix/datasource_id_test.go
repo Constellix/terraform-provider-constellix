@@ -68,6 +68,28 @@ func TestDataSourceIDs(t *testing.T) {
 				"roundrobin_failover.0.disable_flag": "false",
 			},
 		},
+		{
+			name:       "a_record_pool",
+			resource:   datasourceConstellixARecordPool(),
+			path:       "/v1/pools/A/",
+			attributes: `,"numReturn":1,"minAvailableFailover":1,"version":1000001,"failedFlag":false,"disableFlag":true,"values":[{"value":"192.0.2.1","weight":10,"disableFlag":false,"policy":"followsonar","checkId":1000001}]`,
+			want: map[string]interface{}{
+				"num_return":             1,
+				"min_available_failover": 1,
+				"version":                1000001,
+				"failed_flag":            false,
+				"disable_flag_1":         true,
+				"values": []interface{}{
+					map[string]interface{}{
+						"value":        "192.0.2.1",
+						"weight":       10,
+						"disable_flag": "false",
+						"policy":       "followsonar",
+						"check_id":     1000001,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -98,7 +120,11 @@ func TestDataSourceIDs(t *testing.T) {
 						t.Errorf("ID = %q, want %q", d.Id(), id)
 					}
 					for key, want := range tt.want {
-						if got := d.Get(key); !reflect.DeepEqual(got, want) {
+						got := d.Get(key)
+						if set, ok := got.(*schema.Set); ok {
+							got = set.List()
+						}
+						if !reflect.DeepEqual(got, want) {
 							t.Errorf("%s = %#v, want %#v", key, got, want)
 						}
 					}
