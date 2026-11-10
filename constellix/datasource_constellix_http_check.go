@@ -1,7 +1,6 @@
 package constellix
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
@@ -138,7 +137,9 @@ func datasourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) er
 	bodystring := string(bodybytes)
 
 	var data []interface{}
-	json.Unmarshal([]byte(bodystring), &data)
+	if err := decodeJSONResponse([]byte(bodystring), &data); err != nil {
+		return err
+	}
 
 	var tp map[string]interface{}
 	var flag bool

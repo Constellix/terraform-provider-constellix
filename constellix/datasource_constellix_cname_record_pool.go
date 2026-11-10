@@ -1,7 +1,6 @@
 package constellix
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -107,7 +106,9 @@ func datasourceConstellixCnamerecordPoolRead(d *schema.ResourceData, m interface
 	bodystring := string(bodybytes)
 
 	var data []interface{}
-	json.Unmarshal([]byte(bodystring), &data)
+	if err := decodeJSONResponse([]byte(bodystring), &data); err != nil {
+		return err
+	}
 
 	var tp map[string]interface{}
 	var flag bool
