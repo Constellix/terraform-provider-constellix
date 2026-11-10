@@ -2,7 +2,6 @@ package constellix
 
 import (
 	b64 "encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -133,7 +132,9 @@ func datasourceConstellixCertRead(d *schema.ResourceData, m interface{}) error {
 	var flag bool
 	var tp map[string]interface{}
 	var data []interface{}
-	json.Unmarshal([]byte(bodystring), &data)
+	if err := decodeJSONResponse([]byte(bodystring), &data); err != nil {
+		return err
+	}
 	for _, val := range data {
 		tp = val.(map[string]interface{})
 		if tp["name"] == name {

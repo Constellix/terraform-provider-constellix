@@ -1,7 +1,6 @@
 package constellix
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -116,7 +115,9 @@ func datasourceConstellixSRVRead(d *schema.ResourceData, m interface{}) error {
 	bodyString := string(bodyBytes)
 
 	var data []interface{}
-	json.Unmarshal([]byte(bodyString), &data)
+	if err := decodeJSONResponse([]byte(bodyString), &data); err != nil {
+		return err
+	}
 
 	var tp map[string]interface{}
 	var flag bool

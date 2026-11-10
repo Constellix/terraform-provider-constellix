@@ -1,7 +1,6 @@
 package constellix
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
@@ -108,7 +107,9 @@ func datasourceConstellixNSRead(d *schema.ResourceData, m interface{}) error {
 	var data []interface{}
 	var temp map[string]interface{}
 	var flag bool
-	json.Unmarshal([]byte(bodyString), &data)
+	if err := decodeJSONResponse([]byte(bodyString), &data); err != nil {
+		return err
+	}
 	for _, val := range data {
 		temp = val.(map[string]interface{})
 		if temp["name"].(string) == name1 {

@@ -52,6 +52,11 @@ resource "constellix_domain" "domain1" {
 }
 ```
 
+Data Source IDs
+---------------
+Data source IDs are exposed as strings containing decimal digits, such as
+`"1000000"`. Pass these strings directly to ID arguments such as `domain_id`.
+
 Argument Reference
 ------------------
 Following arguments are supported with Constellix terraform provider.
