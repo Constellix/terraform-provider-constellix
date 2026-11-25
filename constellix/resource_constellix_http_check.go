@@ -101,6 +101,11 @@ func resourceConstellixHTTPCheck() *schema.Resource {
 					"MAJORITY",
 				}, false),
 			},
+			"ssl_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -158,6 +163,7 @@ func resourceConstellixHTTPCheckImport(d *schema.ResourceData, m interface{}) ([
 	d.Set("interval", data["interval"])
 	d.Set("interval_policy", data["monitorIntervalPolicy"])
 	d.Set("verification_policy", data["verificationPolicy"])
+	d.Set("ssl_policy", data["sslPolicy"])
 	d.Set("fqdn", data["fqdn"])
 	d.Set("path", data["path"])
 	d.Set("search_string", data["searchString"])
@@ -214,6 +220,10 @@ func resourceConstellixHTTPCheckCreate(d *schema.ResourceData, m interface{}) er
 
 	if verification_policy, ok := d.GetOk("verification_policy"); ok {
 		httpcheckAttr.VerificationPolicy = verification_policy.(string)
+	}
+
+	if sslPolicy, ok := d.GetOk("ssl_policy"); ok {
+		httpcheckAttr.SSLPolicy = sslPolicy.(string)
 	}
 
 	if fqdn, ok := d.GetOk("fqdn"); ok {
@@ -292,6 +302,10 @@ func resourceConstellixHTTPCheckUpdate(d *schema.ResourceData, m interface{}) er
 		httpcheckAttr.VerificationPolicy = verification_policy.(string)
 	}
 
+	if sslPolicy, ok := d.GetOk("ssl_policy"); ok {
+		httpcheckAttr.SSLPolicy = sslPolicy.(string)
+	}
+
 	if fqdn, ok := d.GetOk("fqdn"); ok {
 		httpcheckAttr.FQDN = fqdn.(string)
 	}
@@ -340,6 +354,7 @@ func resourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) erro
 	d.Set("interval", data["interval"])
 	d.Set("interval_policy", data["monitorIntervalPolicy"])
 	d.Set("verification_policy", data["verificationPolicy"])
+	d.Set("ssl_policy", data["sslPolicy"])
 	d.Set("fqdn", data["fqdn"])
 	d.Set("path", data["path"])
 	d.Set("search_string", data["searchString"])

@@ -32,6 +32,28 @@ func TestAccHTTPCheck_Basic(t *testing.T) {
 	})
 }
 
+func TestHTTPCheckSSLPolicyJSON(t *testing.T) {
+	payload, err := json.Marshal(models.HttpcheckAttr{
+		Host:      "constellix.com",
+		ProtoType: "HTTPS",
+		SSLPolicy: "IGNORE",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var data map[string]interface{}
+	if err := json.Unmarshal(payload, &data); err != nil {
+		t.Fatal(err)
+	}
+	if data["sslPolicy"] != "IGNORE" {
+		t.Fatalf("expected sslPolicy to be serialized as IGNORE, got %v", data["sslPolicy"])
+	}
+	if data["host"] != "constellix.com" || data["protocolType"] != "HTTPS" {
+		t.Fatalf("expected HTTP check fields to be serialized at the top level, got %s", payload)
+	}
+}
+
 func TestAccConstellixHTTPCheck_Update(t *testing.T) {
 	var httpCheck models.HttpcheckAttr
 

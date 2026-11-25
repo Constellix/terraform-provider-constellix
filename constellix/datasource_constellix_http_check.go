@@ -94,6 +94,11 @@ func datasourceConstellixHTTPCheck() *schema.Resource {
 					"MAJORITY",
 				}, false),
 			},
+			"ssl_policy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 			"fqdn": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -157,6 +162,7 @@ func datasourceConstellixHTTPCheckRead(d *schema.ResourceData, m interface{}) er
 			d.Set("interval", tp["interval"])
 			d.Set("interval_policy", tp["monitorIntervalPolicy"])
 			d.Set("verification_policy", tp["verificationPolicy"])
+			d.Set("ssl_policy", tp["sslPolicy"])
 			d.Set("fqdn", tp["fqdn"])
 			d.Set("path", tp["path"])
 			d.Set("search_string", tp["searchString"])
