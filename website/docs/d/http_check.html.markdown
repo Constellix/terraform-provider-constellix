@@ -32,6 +32,7 @@ data "constellix_http_check" "check" {
 * `interval` - (Optional) Check Interval. Allowed values are `THIRTYSECONDS`, `ONEMINUTE`, `TWOMINUTES`, `THREEMINUTES`, `FOURMINUTES`, `FIVEMINUTES`, `TENMINUTES`, `THIRTYMINUTES`, `HALFDAY` and `DAY`.
 * `interval_policy` - (Optional) Agent Interval Run Policy. It specifies whether you want to run checks from one location or all. Allowed values are `PARALLEL`, `ONCEPERSITE` and `ONCEPERREGION`.
 * `verification_policy` - (Optional) Specifies how the check should be validated. Allowed values are `SIMPLE` and `MAJORITY`. This parameter will only work with the `interval_policy` set to `PARALLEL`.
+* `ssl_policy` - (Optional) SSL certificate policy configured for the HTTPS check.
 * `fqdn` - (Optional) Fully qualified domain name of the URL should be checked.
 * `path` - (Optional) In case of multi-page site, which path should be checked.
 * `search_string` - (Optional) String to search in the first 2KB of resonse received.
