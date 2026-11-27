@@ -1,7 +1,6 @@
 package constellix
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 
@@ -113,7 +112,9 @@ func datasourceConstellixDNSCheckRead(d *schema.ResourceData, m interface{}) err
 	var data []interface{}
 	var flag bool
 	var tp map[string]interface{}
-	json.Unmarshal([]byte(bodyString), &data)
+	if err := decodeJSONResponse([]byte(bodyString), &data); err != nil {
+		return err
+	}
 
 	for _, val := range data {
 		tp = val.(map[string]interface{})

@@ -1,9 +1,30 @@
 package constellix
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"strings"
 )
+
+func decodeJSONResponse(body []byte, target interface{}) error {
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	// Keep numeric IDs out of float64 so their digits and decimal notation are preserved.
+	decoder.UseNumber()
+	if err := decoder.Decode(target); err != nil {
+		return err
+	}
+	var extra interface{}
+	if err := decoder.Decode(&extra); err != io.EOF {
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("unexpected data after JSON response")
+	}
+	return nil
+}
 
 func toStringList(configured interface{}) []string {
 	vs := make([]string, 0, 1)
